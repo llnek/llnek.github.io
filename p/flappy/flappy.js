@@ -34,15 +34,17 @@
            v2:_V,
            ute:_,is}=Mojo;
 
+    ////////////////////////////////////////////////////////////////////////////
+    const Core= window["io/czlab/mcfud/core"]();
+
+    ////////////////////////////////////////////////////////////////////////////
     const NEAT_MODULES={
       "Buckland": {
-        eng: window["io/czlab/mcfud/algo/NEAT_Buckland"](
-                  window["io/czlab/mcfud/core"](), window["io/czlab/mcfud/math"]()),
+        eng: window["io/czlab/mcfud/algo/NEAT_Buckland"](),
         id: "MB"
       },
       "CBullet": {
-        eng: window["io/czlab/mcfud/algo/NEAT_CBullet"](
-                  window["io/czlab/mcfud/core"](), window["io/czlab/mcfud/math"]()),
+        eng: window["io/czlab/mcfud/algo/NEAT_CBullet"](),
         id: "CB"
       }
     };

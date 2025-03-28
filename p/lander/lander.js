@@ -38,35 +38,14 @@
     ////////////////////////////////////////////////////////////////////////////
     const Core= window["io/czlab/mcfud/core"]();
 
-    const ROTATE_LEFT=0,
-          ROTATE_RIGHT=1,
-			    THRUST_UP=2,
-          NONE=3;
-		const MAX_ACTION_DURATION= 5;
-		const MAX_MUTATION_DURATION=3;
-		const DIST_TOLERANCE= 4;
-	  const SPEED_TOLERANCE= 4;
-	  const ROTATION_TOLERANCE= 0.1;
-
     ////////////////////////////////////////////////////////////////////////////
-    // Default physical constants for the game
-    const DEFAULT_MASS = 6000;        // Roughly based on LEM (4000 accent module + dry decent module)
-    const DEFAULT_FUEL = 8000;        // Fuel on the decent module
-    const MASS= DEFAULT_MASS+DEFAULT_FUEL;
-
-    const DEFAULT_DELTA_FUEL = 8;     // HACK - how much fuel we loose each update when the engines fire
-    const GRAVITY = 1.62;     // Acceleration of the moon
-    const THRUST = 45000;     // 45000N as per the LEM decent module
+    const TWO_PI=Math.PI * 2;
+    const MASS= 100;
     const ANGLE_LIMIT = 0.1;  // About 6 degrees
     const SPEED_LIMIT = 10;//2;    // 2 m/s  ( Apollo 17 landed ~ 6.7 feet/s velocity )
-    //const DEFAULT_SPEED = 2;          // Game speed - make for a faster 'arcade-like' game
-    //const DEFAULT_DELAY = 2000;
-    // Constants
     const CONST_ONE_DEGREE = Math.PI / 180;   // 1 degree in radians
-    const ROTATION=CONST_ONE_DEGREE;
-		const GRAVITY_PER_TICK= GRAVITY/60;
-		const THRUST_PER_TICK= THRUST/60;
-		const ROTATION_PER_TICK= ROTATION/60;
+    const GRAVITY=  1/100;//1/60;//1.63/60;
+    const THRUST=  -2;// -10;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     const
@@ -96,7 +75,7 @@
           initTerrain(out){
             let maxH=int(Mojo.height*0.4);
             let minH= int(maxH*0.25);
-            let hoffset=100*K;
+            let hoffset=10* K;//100*K;
             let s,pad=4,N=10;
             let w=Mojo.width/N;
             let vcolor=_S.color("#906908");
@@ -144,7 +123,7 @@
             _S.centerAnchor(ps);
             ps.x=T[pad].x+T[pad].width/2;
             ps.y=T[pad].y-ps.height/2;
-            self.insert(ps,true);
+            out.push(self.insert(ps,true));
             /////pad2
             if(false){
               pad=N-1;
@@ -165,44 +144,45 @@
                 p=_S.sprite(_S.frames("lander.png",w,w)),
                 k= 0.6*_G.target.width/p.width;
             _S.centerAnchor(_S.scaleBy(p,k,k));
-            p.m5.vel[0]=_.randSign()*20;
+            p.m5.vel[0]=0;//_.randSign()*20;
             //p.m5.vel[1]=100;
             p.m5.mass=MASS;
             p.m5.tick=(dt)=>{
               if(p.g.landed){return}
-              p.x += p.m5.vel[0]* dt;
-              p.y += p.m5.vel[1] * dt;
-              //update the acceleration
-              p.m5.vel[1] += 1.2*GRAVITY * dt;
+              p.m5.vel[1] += GRAVITY;
+              p.x += p.m5.vel[0];
+              p.y += p.m5.vel[1];
               if(_I.keyDown(_I.LEFT)){
                 p.rotation -= CONST_ONE_DEGREE;
+                if(p.rotation< -Math.PI){ p.rotation += TWO_PI; }
               }
               if(_I.keyDown(_I.RIGHT)){
                 p.rotation += CONST_ONE_DEGREE;
+                if(p.rotation> TWO_PI){ p.rotation -= TWO_PI; }
               }
               if(_I.keyDown(_I.SPACE)||_I.keyDown(_I.UP)){
-                let accel = 2*THRUST * dt / p.m5.mass;
-                p.m5.vel[0] += accel * Math.sin(p.rotation);
-                p.m5.vel[1] -= accel * Math.cos(p.rotation);
+                let accel = THRUST / p.m5.mass;
+                p.m5.vel[0] -= accel * Math.sin(p.rotation);
+                p.m5.vel[1] += accel * Math.cos(p.rotation);
               }
             };
-            p.x=_.randInt2(Mojo.width*0.1,Mojo.width*0.9);
+            if(_.randSign()>0){
+              p.x= _.randInt2(0,Mojo.width * 0.3);
+            }else{
+              p.x= _.randInt2(Mojo.width * 0.7, Mojo.width);
+            }
+            function cb(){
+              p.m5.showFrame(_I.keyDown(_I.SPACE)||_I.keyDown(_I.UP) ? 1 :0);
+              self.future(cb,300);
+            }
+            self.future(cb,300);
             _G.player= self.insert(p,true);
           }
         });
-        function cb(){
-          if(_I.keyDown(_I.SPACE)||_I.keyDown(_I.UP)){
-            _G.player.m5.showFrame(1);
-          }else{
-            _G.player.m5.showFrame(0);
-          }
-          self.future(cb,500);
-        }
-        self.future(cb,500);
         //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         _Z.run("StarfieldBg",{static:true});
-        this.g.initLevel();
         this.g.initTerrain([]);
+        this.g.initLevel();
         this.g.initPlayer();
         _Z.run("HotKeys",{down:false });
       },
@@ -210,26 +190,27 @@
         this.g.toggle && this.g.toggle.dispose();
       },
       postUpdate(dt){
-        let ok,objs=this.searchSGrid(_G.player);
-        for(let o,i=0;i<objs.length;++i){
-          o=objs[i];
+        let ok;
+        if(_G.obstacles.find(o=>{
           if(_S.hit(o,_G.player)){
             if(o.m5.uuid=="landing_pad"){
+              console.log(`x=${_G.player.m5.vel[0]}, y=${_G.player.m5.vel[1]}`);
+              console.log(`rot=${_G.player.rotation}`);
               let v = _G.player.m5.vel[0] + _G.player.m5.vel[1];
               let ang = Math.abs(_G.player.rotation);
               ok=v < SPEED_LIMIT && ang < ANGLE_LIMIT;
             }
-            this.m5.dead=true;
-            _.delay(CLICK_DELAY,()=>{
-              _Z.modal("EndGame",{
-                replay:{name:"PlayGame"},
-                quit:{name:"Splash", cfg:SplashCfg},
-                msg: ok?"You Win!":"You Lose!",
-                winner:ok
-              })
-            });
-            break;
+            return (this.m5.dead=true);
           }
+        })){
+          _.delay(CLICK_DELAY,()=>{
+            _Z.modal("EndGame",{
+              replay:{name:"PlayGame"},
+              quit:{name:"Splash", cfg:SplashCfg},
+              msg: ok?"You Win!":"You Lose!",
+              winner:ok
+            })
+          });
         }
       }
     });

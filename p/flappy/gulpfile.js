@@ -8,7 +8,10 @@ const jsdoc=require("gulp-jsdoc3");
 const sourcemaps = require('gulp-sourcemaps');
 
 const jsFiles = [
-  "../../vendor/pixi.min.js","../../vendor/mcfud.min.js","../../vendor/shimoji.min.js",
+  "../../vendor/pixi.min.js",
+  "../../vendor/mcfud.min.js",
+  "../../vendor/crafty.min.js",
+  "../../vendor/shimoji.min.js",
   "flappy.js"
 ];
 

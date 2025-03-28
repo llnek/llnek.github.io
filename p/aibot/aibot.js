@@ -34,10 +34,9 @@
     const {Geo}=_S;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    const GA= window["io/czlab/mcfud/algo/NEAT"](
-      window["io/czlab/mcfud/core"]()
-    );
-    const NumFIT= GA.NumFitness;
+    const GA=window[ 1 ? "io/czlab/mcfud/algo/NEAT_Buckland" :
+    "io/czlab/mcfud/algo/NEAT_CBullet"
+    ]();
     const int=Math.floor;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -140,13 +139,13 @@
         H2:h2,
         lTrack: 0,
         rTrack: 0,
-        fitness: NumFIT(0),
+        fitness: 0,
         mmap: MapMemory(),
         spinBonus: 0,
         collisionBonus: 0,
         nnet:brain,
         reset(){
-          this.fitness = NumFIT(0);
+          this.fitness = 0;
           s.angle= ang;
           syncHeading(randPos(s));
           this.mmap.reset();
@@ -194,7 +193,7 @@
           return input.push(this.collided?1:0) && input;
         },
         endOfRunCalc(){
-          this.fitness = NumFIT(this.fitness.score()+ this.mmap.numCellsVisited());
+          this.fitness = this.fitness + this.mmap.numCellsVisited();
         },
         update(){
           let rotForce,output = this.nnet.update(this.testSensors([]));
@@ -372,7 +371,7 @@
             this.letThemRoam=()=> vecBots.forEach(v=> v.g.update());
             this.reGen=()=>{
               vecBots.forEach(v=> v.g.endOfRunCalc());
-              gaPop.epoch(vecBots.map(v=> v.g.fitness.score())).forEach((b,i)=>{
+              gaPop.epoch(vecBots.map(v=> v.g.fitness)).forEach((b,i)=>{
                 vecBots[i].g.nnet=b;
                 vecBots[i].g.reset();
               });

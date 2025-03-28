@@ -106,28 +106,33 @@
         if(outputs.length==0) return false;
         for(let u,ws,op=0;op<nnet.numOutputs;++op){
           err = (setOut[vec][op] - outputs[op]) * outputs[op] * (1 - outputs[op]);
-          u=nnet.layers[1].neurons[op];
+          u=nnet.getLayer(1).neuronAt(op);
           ws=u.weights;
           u.error = err;
           nnet.errorSum += (setOut[vec][op] - outputs[op]) * (setOut[vec][op] - outputs[op]);
 
-          for(let i=0;i<ws.length-1;++i)
-            ws[i] += err*learnRate*nnet.layers[0].neurons[i].activation;
+          u.iterWeights((w,i,arr)=>{
+            //skip bias
+            if(i< arr.length-1)
+              arr[i] += err*learnRate*nnet.getLayer(0).neuronAt(i).activation;
+          });
 
-          ws[ws.length-1] += err * learnRate * _G.params.BIAS;
+          u.setBias(u.getBias() + err * learnRate * _G.params.BIAS);
         }
 
-        for(let i=0;i<nnet.layers[0].neurons.length;++i){
+        for(let i=0;i<nnet.getLayer(0).numNeurons; ++i){
           err = 0;
-          for(let j=0;j<nnet.layers[1].neurons.length;++j){
-            err += nnet.layers[1].neurons[j].error * nnet.layers[1].neurons[j].weights[i];
+          for(let j=0;j<nnet.getLayer(1).numNeurons; ++j){
+            err += nnet.getLayer(1).neuronAt(j).error * nnet.getLayer(1).neuronAt(j).getWeight(i);
           }
-          err *= nnet.layers[0].neurons[i].activation * (1-nnet.layers[0].neurons[i].activation);
+          err *= nnet.getLayer(0).neuronAt(i).activation * (1-nnet.getLayer(0).neuronAt(i).activation);
 
           for(let w=0;w<nnet.numInputs;++w)
-            nnet.layers[0].neurons[i].weights[w] += err * learnRate * setIn[vec][w];
+            nnet.getLayer(0).neuronAt(i).setWeight(w,
+              nnet.getLayer(0).neuronAt(i).getWeight(w) + err * learnRate * setIn[vec][w]);
 
-          nnet.layers[0].neurons[i].weights[nnet.numInputs] += err * _G.params.BIAS;
+          nnet.getLayer(0).neuronAt(i).setWeight(nnet.numInputs,
+            nnet.getLayer(0).neuronAt(i).getWeight(nnet.numInputs) + err * _G.params.BIAS);
         }
       }
       return true;
@@ -145,9 +150,13 @@
       nnet.errorSum = 9999.9;
       nnet.trainCycles = 0;
       nnet.trained=false;
-      nnet.layers.forEach(y=> y.neurons.forEach(u=>{
-        u.weights=_.fill(u.numInputs, ()=> _.randMinus1To1())
-      }));
+      nnet.iterLayers((y)=>{
+        y.iterNeurons((u)=>{
+          u.iterWeights((w,i,arr)=>{
+            arr[i]= _.randMinus1To1()
+          })
+        })
+      });
       //
       async.run((count=100,extra=null)=>{
         let s;
@@ -195,7 +204,7 @@
             let s,verb= Mojo.touchDevice?"Tap":"Click";
             _G.data = CData();
             _G.pmap={};
-            _G.nnet = new GA.NeuralNet(2*NUM_INPUTS, NUM_OUTPUTS, 1,NEURONS_PER_HIDDEN);
+            _G.nnet = new GA.NeuralNet(2*NUM_INPUTS, NUM_OUTPUTS, [1,NEURONS_PER_HIDDEN]);
             this.numSmoothPoints = NUM_INPUTS+1;
             this.highestOutput = 0;
             this.bestMatch = 0;
