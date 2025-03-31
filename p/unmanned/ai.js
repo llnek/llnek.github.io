@@ -78,7 +78,7 @@
     const ROT_L=1, ROT_R=2, FIRE_THRUST=3, FFALL= 4;
     const ACTIONS=[ROT_L, ROT_R, FIRE_THRUST, FFALL];
 
-    const MAX_ACTION_COUNT = 30;
+    const MAX_ACTION_COUNT = 50;//30;
     const BIG_NUMBER=9999999;
 
     const GRAVITY_PER_TICK=      GRAVITY;
@@ -90,7 +90,7 @@
     const DIST_TOLERANCE=         10.0;
 
     const POPSIZE=              100;
-    const CHROMO_LENGTH=         30;
+    const CHROMO_LENGTH= 100;//50;//         30;
 
     const MAX_GENERATIONS_ALLOWED= 500;
 
