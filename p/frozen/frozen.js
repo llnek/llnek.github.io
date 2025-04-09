@@ -85,6 +85,8 @@
       DECAY_RATE: 0.00005
     };
 
+    const ACTIONS = ["L","R","U","D"];
+
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     /* */
     ////////////////////////////////////////////////////////////////////////////
@@ -92,6 +94,7 @@
      * @class
      */
     class GameEnv extends DQL.Environment{
+      #goalPos;
       #grid;
       #dim;
       #pos;
@@ -102,34 +105,35 @@
         this.#dim=N;
         ENV_MAP[`T_${N}X${N}`].forEach(r=> r.split("").forEach(c=> this.#grid.push(c)));
         _.assert(this.#grid.length==N*N, `bad grid size ${this.#grid.length}`);
+        this.#goalPos = this.#grid.findIndex(c=> "G");
       }
       reset(){
         this.#pos= this.#grid.findIndex(c=> "S");
         return this.#pos;
       }
-      actionSpace(){ return ["L","R","U","D"]; }
+      actionSpace(){ return ACTIONS }
       #applyAction(action){
         let row= Math.floor(this.#pos / this.#dim);
         let col= this.#pos % this.#dim;
         let v, i=-1, reward=-100, done=0;
         switch(action){
           case "U":
-            if(row==0){ reward= -10; }else{
+            if(row==0){ reward= -1000; }else{
               i= (row-1)*this.#dim + col;
             }
             break;
           case "D":
-            if(row== this.#dim-1){ reward= -10; }else{
+            if(row== this.#dim-1){ reward= -1000; }else{
               i=(row+1)*this.#dim + col;
             }
             break;
           case "L":
-            if(col== 0){ reward= -10;}else{
+            if(col== 0){ reward= -1000;}else{
               i=row * this.#dim + col-1;
             }
             break;
           case "R":
-            if(col== this.#dim-1) { reward= -10; }else{
+            if(col== this.#dim-1) { reward= -1000; }else{
               i= row * this.#dim + col+1;
             }
             break;
@@ -141,9 +145,9 @@
             reward= 999999;
             done=1;
           }else if(v=="H"){
-            done=-1;
+            done=-999999;
           }else{
-            reward=30;
+            reward = (Math.abs(this.#goalPos - this.#pos)<5) ? 300 : 30;
           }
         }
         return [reward, done];
@@ -202,6 +206,7 @@
           }
           if(_G.curStep < _G.maxSteps){
             action= _G.agent.getAction(cs, _G.env.actionSpace());
+            console.log(`Got new action === ${action}`);
             [ns, reward, done]= _G.env.step(action);
             _G.agent.updateQValue(cs, action, ns, reward);
             _G.mem.push([cs,action,ns, reward]);
@@ -315,7 +320,17 @@
             let env= new GameEnv(DQLOpts,MAP_SIZE);
             let vars=env.getVars();
             let agent= new DQL.QLAgent(vars.ALPHA,vars.GAMMA,
-                                       vars.MIN_EPSILON,vars.MAX_EPSILON,vars.DECAY_RATE);
+              vars.MIN_EPSILON,vars.MAX_EPSILON,vars.DECAY_RATE, {
+                randActionFunc:function(arr){
+                  let pos;
+                  if(_.rand()< 0.5){
+                    pos= _.rand() < 0.5 ? 0 : 3
+                  }else{
+                    pos= _.rand() < 0.5 ? 1 : 2
+                  }
+                  return ACTIONS[pos];
+                }
+              });
             _G.totalEpisodes= vars.EPISODES;
             _G.maxSteps= vars.MAX_STEPS;
             _G.agent= agent;
