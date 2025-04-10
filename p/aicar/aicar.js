@@ -111,18 +111,23 @@
           s.m5.dead=true;
         }
       };
-      s.g.chkRadarHit=function(lineStart, lineEnd){
-        return _G.obstacles.find(o=>
+      s.g.chkRadarHit=function(lineStart, lineEnd, obstacles){
+        return obstacles.find(o=>
           Geo.hitTestLinePolygon(lineStart, lineEnd,
                                  Geo.bodyWrap(_S.toPolygon(o),o.x,o.y))[0]);
+      };
+      s.g.preChk=function(c,e){
+        return _G.obstacles.filter(o=> Geo.hitTestLinePolygon(c, e, Geo.bodyWrap(_S.toPolygon(o),o.x,o.y))[0])
       };
       s.g.chkRadar=function(c, r, proj){
         let nx = Math.cos(r),
             ny = Math.sin(r),
-            pt = [s.x + int(nx * proj),
-                  s.y + int(ny * proj) ],
+            pt = [c[0] + int(nx * proj),
+                  c[1] + int(ny * proj) ],
             len= proj + proj * s.g.radarProj;
-        while(!this.chkRadarHit(c, pt) && proj < len){
+        let obstacles = this.preChk(c, [c[0] + int(nx * len), c[1] + int(ny * len)]);
+        //console.log(`Found ${obstacles.length} obstacles instead of ${_G.obstacles.length}`);
+        while(!this.chkRadarHit(c, pt,obstacles) && proj < len){
           proj+=1;
           pt[0] = s.x + int(nx * proj);
           pt[1] = s.y + int(ny * proj);
