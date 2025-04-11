@@ -366,15 +366,11 @@
         this.insert(_I.mkBtn(this.g.menu));
       },
       postUpdate(dt){
-        if(_I.keyDown(_I.SPACE)){
-          _G.showRadar= !_G.showRadar;
-        }
         _G.remaining=this.g.cars.reduce((acc,c)=> acc + (c.m5.dead?0:1),0);
         if(_G.remaining<=3){
-          //this.g.cars.forEach(c=> c.m5.dead?0: _S.tint(c,"magenta"));
-        }
-        if(_G.remaining<=3){
           _G.showRadar=true;
+        }else{
+          _G.showRadar=false;
         }
         this.g.dbg.clear();
         this.g.tick();
@@ -395,6 +391,7 @@
     start(...args){ scenes(...args) }
   });
 
+  //console.log("bonjour");
 })(this);
 
 
