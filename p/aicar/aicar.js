@@ -111,22 +111,55 @@
           s.m5.dead=true;
         }
       };
-      s.g.chkRadarHit=function(lineStart, lineEnd, obstacles){
-        return obstacles.find(o=>
-          Geo.hitTestLinePolygon(lineStart, lineEnd,
-                                 Geo.bodyWrap(_S.toPolygon(o),o.x,o.y))[0]);
+      s.g.chkRadarHit=function(lineStart, lineEnd, obstacles, out){
+        let d,x,y,pe,rc,found,dist=Infinity;
+        obstacles.forEach(o=>{
+          rc=Geo.hitTestLinePolygon(lineStart, lineEnd, Geo.bodyWrap(_S.toPolygon(o),o.x,o.y));
+          if(rc[0]){
+            pe=rc[2];
+            x= pe[0]-lineStart[0];
+            y= pe[1]-lineStart[1];
+            d=Math.sqrt(x*x+y*y);
+            if(d<dist){
+              dist=d;
+              found=[dist, rc[1], [int(rc[2][0]),int(rc[2][1])]];
+            }
+          }
+        });
+        if(found) out.push(found);
+        return found;
       };
       s.g.preChk=function(c,e){
         return _G.obstacles.filter(o=> Geo.hitTestLinePolygon(c, e, Geo.bodyWrap(_S.toPolygon(o),o.x,o.y))[0])
       };
       s.g.chkRadar=function(c, r, proj){
-        let nx = Math.cos(r),
-            ny = Math.sin(r),
-            pt = [c[0] + int(nx * proj),
-                  c[1] + int(ny * proj) ],
-            len= proj + proj * s.g.radarProj;
+        let nx = Math.cos(r), ny = Math.sin(r),
+            len= proj + proj * s.g.radarProj,
+            pt = [c[0] + int(nx * proj), c[1] + int(ny * proj) ];
+        let found=[], obstacles = this.preChk(c, [c[0] + int(nx * len), c[1] + int(ny * len)]);
+        pt = [c[0] + int(nx * len), c[1] + int(ny * len) ];
+        if(!this.chkRadarHit(c, pt,obstacles,found)){
+          pt[0] = s.x + int(nx * len);
+          pt[1] = s.y + int(ny * len);
+          let dx = pt[0]-s.x, dy = pt[1]-s.y, dd=int(Math.sqrt(dx*dx+dy*dy));
+          return [pt,dd];
+        }else{
+          found=found[0];
+          return [ found[2], found[0]];
+        }
+        //console.log(`Found dist= ${fdist}, calced dist = ${dd}`);
+        //console.log(`Found pt= ${found[2][0]},${found[2][1]}, calced pt = ${pt[0]},${pt[1]}`);
+      };
+      s.g.chkRadarHitSlow=function(lineStart, lineEnd, obstacles){
+        return obstacles.find(o=>
+          Geo.hitTestLinePolygon(lineStart, lineEnd,
+                                 Geo.bodyWrap(_S.toPolygon(o),o.x,o.y))[0]);
+      };
+      s.g.chkRadarSlow=function(c, r, proj){
+        let nx = Math.cos(r), ny = Math.sin(r),
+            len= proj + proj * s.g.radarProj,
+            pt = [c[0] + int(nx * proj), c[1] + int(ny * proj) ];
         let obstacles = this.preChk(c, [c[0] + int(nx * len), c[1] + int(ny * len)]);
-        //console.log(`Found ${obstacles.length} obstacles instead of ${_G.obstacles.length}`);
         while(!this.chkRadarHit(c, pt,obstacles) && proj < len){
           proj+=1;
           pt[0] = s.x + int(nx * proj);
@@ -340,8 +373,8 @@
         if(_G.remaining<=3){
           //this.g.cars.forEach(c=> c.m5.dead?0: _S.tint(c,"magenta"));
         }
-        if(_G.remaining==1){
-          //_G.showRadar=true;
+        if(_G.remaining<=3){
+          _G.showRadar=true;
         }
         this.g.dbg.clear();
         this.g.tick();
