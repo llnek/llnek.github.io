@@ -232,9 +232,13 @@
       s.g.tickCount=0;
       s.g.landed=false;
       s.g.look=function(){
+        let dx= _G.target.x-s.x;
+        let dy= _G.target.y-s.y;
+        let dist=Math.sqrt(dx*dx+dy*dy);
         return [
+          _M.remap(dist,0,Mojo.height,0,1),
           _M.remap(Math.abs(_G.target.x - s.x),0,Mojo.width,0,1),
-          _M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
+          //_M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
           _M.remap(s.m5.vel[0], -1000,1000,-1,1),
           _M.remap(s.m5.vel[1], -1000,1000,-1,1),
           _M.remap(s.rotation,-TWO_PI, TWO_PI, -1, 1)
@@ -244,6 +248,50 @@
         return s.g.brain.update(inputs);
       };
       s.g.update=function(outputs, dt){
+        if(this.landed){ return false; }
+        s.m5.showFrame(0);
+        if(outputs[1]>0.5){
+          //rotl
+            s.rotation -= ROTATION_PER_TICK;
+            if(s.rotation < -Math.PI){
+              s.rotation += TWO_PI;
+            }
+            //s.m5.vel[0] -= 1;
+        }
+        if(outputs[2]>0.5){
+          //rotr
+            s.rotation += ROTATION_PER_TICK;
+            if(s.rotation > TWO_PI){
+              s.rotation -= TWO_PI;
+            }
+            //s.m5.vel[0] += 1;
+        }
+        if(outputs[3]>0.5){
+            let a = THRUST_PER_TICK/s.m5.mass;
+            s.m5.vel[0] += a * sin(s.rotation);
+            s.m5.vel[1] += a * cos(s.rotation);
+            this.showJet = true;
+            s.m5.showFrame(1);
+        }
+        s.m5.vel[1] += GRAVITY;
+        s.x += s.m5.vel[0];
+        s.y += s.m5.vel[1];
+        this.tickCount += 1;
+        this.showJet = false;
+        if(s.x > Mojo.width){
+          s.m5.dead=true;
+        }
+        else if(s.x < 0){
+          s.m5.dead=true;
+        }
+        else if(s.y < -2*s.height){
+          s.m5.dead=true;
+        }
+        else if(testForImpact(s) && !this.landed){
+          calcScore(s);
+        }
+      };
+      s.g.updateZZZ=function(outputs, dt){
         let [pos,val]= argMax(outputs);
         if(this.landed){ return false; }
         s.m5.showFrame(0);
