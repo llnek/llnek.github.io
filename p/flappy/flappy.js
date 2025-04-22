@@ -35,19 +35,8 @@
            ute:_,is}=Mojo;
 
     ////////////////////////////////////////////////////////////////////////////
+    const GA= window["io/czlab/mcfud/algo/NEAT"]();
     const Core= window["io/czlab/mcfud/core"]();
-
-    ////////////////////////////////////////////////////////////////////////////
-    const NEAT_MODULES={
-      "Buckland": {
-        eng: window["io/czlab/mcfud/algo/NEAT_Buckland"](),
-        id: "MB"
-      },
-      "CBullet": {
-        eng: window["io/czlab/mcfud/algo/NEAT_CBullet"](),
-        id: "CB"
-      }
-    };
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     const
@@ -179,12 +168,10 @@
             this.bestCurScore=0;
             this.bgSpeed = 0.5;
             this.bgX = 0;
-            this.swapEngine(this.NeatModule);
+            this.swapEngine();
           },
-          swapEngine(e){
-            this.NeatModule=e;
-            this.Neat= NEAT_MODULES[this.NeatModule];
-            this.neatObj= new this.Neat.eng.NeatGA(POPSIZE, INPUTS, OUTPUTS);
+          swapEngine(){
+            this.neatObj= new GA.NeatGA(POPSIZE, INPUTS, OUTPUTS);
             this.birds.forEach(b=> _S.remove(b));
             this.birds= this.neatObj.createPhenotypes().map(g=> new Bird(self,K,g));
             this.resetNext(true);
@@ -225,9 +212,10 @@
             this.interval = 0;
             _.trunc(this.pipes);
             if(!skip){
-              this.birds = this.neatObj.epoch(this.birds.reduce((acc,s)=>{
+              this.neatObj.epoch(this.birds.reduce((acc,s)=>{
                 return acc.push(s.g.score) && _S.remove(s) && acc
-              }, [])).map(g=> new Bird(self,K,g));
+              }, []));
+              this.birds= this.neatObj.createPhenotypes().map(g=> new Bird(self,K,g));
             }
           },
           checkPipes(){
@@ -287,18 +275,13 @@
       },
       postUpdate(dt){
         if(_I.keyDown(_I.TAB)){
-          if(this.g.NeatModule=="CBullet"){
-            this.g.swapEngine("Buckland");
-          }else if(this.g.NeatModule=="Buckland"){
-            this.g.swapEngine("CBullet");
-          }
         }else{
           this.g.bgs.forEach((s,i)=>{
             s.x= i * s.width - int(this.g.bgX % s.width);
             s.y=0;
           });
           this.g.tick();
-          this.g.genText.text= `Generation(${this.g.Neat.id}): ${this.g.neatObj.curGen()} - Pipes: ${this.g.pipesPassed} Score: ${this.g.bestCurScore}`;
+          this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} - Pipes: ${this.g.pipesPassed} Score: ${this.g.bestCurScore}`;
         }
       }
     });

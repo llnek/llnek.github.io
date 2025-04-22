@@ -12,7 +12,7 @@ const jsFiles = [
   "../../vendor/mcfud.min.js",
   "../../vendor/crafty.min.js",
   "../../vendor/shimoji.min.js",
-  "ai.js"
+  "unmanned.js"
 ];
 
 var destDir = 'dist'; //or any folder inside your public asset folder

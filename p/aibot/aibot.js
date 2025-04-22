@@ -34,9 +34,7 @@
     const {Geo}=_S;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    const GA=window[ 1 ? "io/czlab/mcfud/algo/NEAT_Buckland" :
-    "io/czlab/mcfud/algo/NEAT_CBullet"
-    ]();
+    const GA=window[ "io/czlab/mcfud/algo/NEAT"]();
     const int=Math.floor;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -371,7 +369,8 @@
             this.letThemRoam=()=> vecBots.forEach(v=> v.g.update());
             this.reGen=()=>{
               vecBots.forEach(v=> v.g.endOfRunCalc());
-              gaPop.epoch(vecBots.map(v=> v.g.fitness)).forEach((b,i)=>{
+              gaPop.epoch(vecBots.map(v=> v.g.fitness));
+              gaPop.createPhenotypes().forEach((b,i)=>{
                 vecBots[i].g.nnet=b;
                 vecBots[i].g.reset();
               });

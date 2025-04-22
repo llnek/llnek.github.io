@@ -33,9 +33,9 @@
            ute:_,is}=Mojo;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    const
-      Core= window["io/czlab/mcfud/core"](),
-      GA= window["io/czlab/mcfud/algo/NNetGA"](Core);
+    const GA= window["io/czlab/mcfud/algo/NNet"]();
+    const Core= window["io/czlab/mcfud/core"]();
+    const {NeuralNet}= GA;
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     const
@@ -99,90 +99,29 @@
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     /* */
     ////////////////////////////////////////////////////////////////////////////
-    function networkTrainingCycle(nnet, learnRate, setIn, setOut){
-      nnet.errorSum = 0;
-      for(let err,outputs,vec=0;vec<setIn.length;++vec){
-        outputs = nnet.update(setIn[vec]);
-        if(outputs.length==0) return false;
-        for(let u,ws,op=0;op<nnet.numOutputs;++op){
-          err = (setOut[vec][op] - outputs[op]) * outputs[op] * (1 - outputs[op]);
-          u=nnet.getLayer(1).neuronAt(op);
-          ws=u.weights;
-          u.error = err;
-          nnet.errorSum += (setOut[vec][op] - outputs[op]) * (setOut[vec][op] - outputs[op]);
-
-          u.iterWeights((w,i,arr)=>{
-            //skip bias
-            if(i< arr.length-1)
-              arr[i] += err*learnRate*nnet.getLayer(0).neuronAt(i).activation;
-          });
-
-          u.setBias(u.getBias() + err * learnRate * _G.params.BIAS);
-        }
-
-        for(let i=0;i<nnet.getLayer(0).numNeurons; ++i){
-          err = 0;
-          for(let j=0;j<nnet.getLayer(1).numNeurons; ++j){
-            err += nnet.getLayer(1).neuronAt(j).error * nnet.getLayer(1).neuronAt(j).getWeight(i);
-          }
-          err *= nnet.getLayer(0).neuronAt(i).activation * (1-nnet.getLayer(0).neuronAt(i).activation);
-
-          for(let w=0;w<nnet.numInputs;++w)
-            nnet.getLayer(0).neuronAt(i).setWeight(w,
-              nnet.getLayer(0).neuronAt(i).getWeight(w) + err * learnRate * setIn[vec][w]);
-
-          nnet.getLayer(0).neuronAt(i).setWeight(nnet.numInputs,
-            nnet.getLayer(0).neuronAt(i).getWeight(nnet.numInputs) + err * _G.params.BIAS);
-        }
-      }
-      return true;
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    /* */
-    ////////////////////////////////////////////////////////////////////////////
     function train(nnet,learnRate,data,async){
       let {setIn,setOut} = data;
       _.assert(setIn.length == setOut.length &&
                setIn[0].length == nnet.numInputs &&
                setOut[0].length == nnet.numOutputs, "Inputs/Outputs length is invalid.");
-      //initNetwork()
-      nnet.errorSum = 9999.9;
-      nnet.trainCycles = 0;
-      nnet.trained=false;
-      nnet.iterLayers((y)=>{
-        y.iterNeurons((u)=>{
-          u.iterWeights((w,i,arr)=>{
-            arr[i]= _.randMinus1To1()
-          })
-        })
-      });
+      nnet.resetTraining(learnRate, 9999.9, 0.003);
       //
       async.run((count=100,extra=null)=>{
         let s;
         for(let i=0;i<count && !nnet.trained; ++i){
-          let ok= networkTrainingCycle(nnet, learnRate,setIn, setOut);
+          let ok= NeuralNet.trainOneCycle(nnet, setIn, setOut);
           if(!ok){
             Mojo.CON.log(`Ooopss..... bad training`);
           }
-          nnet.trainCycles += 1;
-          s=`Epoch: ${nnet.trainCycles}, ErrorSum: ${nnet.errorSum}`;
+          s=`Epoch: ${nnet.trainCycle}, ErrorSum: ${nnet.errorSum}`;
           Mojo.CON.log(s);
-          if(nnet.errorSum>0.003){}else{
+          if(nnet.checkTraining()){
             Mojo.CON.log(`trained-ok`);
-            nnet.trained=true;
           }
           extra.text=s;
         }
         return nnet.trained;
       });
-      if(false){
-        while(nnet.errorSum>0.003){
-          if(!networkTrainingCycle(nnet,learnRate,setIn, setOut)) return false;
-          nnet.trainCycles += 1;
-        }
-        return nnet.trained = true;
-      }
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -204,7 +143,9 @@
             let s,verb= Mojo.touchDevice?"Tap":"Click";
             _G.data = CData();
             _G.pmap={};
-            _G.nnet = new GA.NeuralNet(2*NUM_INPUTS, NUM_OUTPUTS, [1,NEURONS_PER_HIDDEN]);
+            _G.nnet = new GA.NeuralNet(2*NUM_INPUTS, NUM_OUTPUTS, {
+              layers:[{ size: NEURONS_PER_HIDDEN }]
+            });
             this.numSmoothPoints = NUM_INPUTS+1;
             this.highestOutput = 0;
             this.bestMatch = 0;
@@ -374,7 +315,7 @@
             }
           }
         });
-        _G.params= GA.config({});
+        _G.params= {BIAS: 1};
         if(1){
           let b,s,out={};
           _S.gridSQ(10,0.8,out);

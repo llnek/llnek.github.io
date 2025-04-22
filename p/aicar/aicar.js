@@ -36,14 +36,12 @@
     const {Geo} = _S;
 
     ////////////////////////////////////////////////////////////////////////////
-    const GA=window[ 1 ? "io/czlab/mcfud/algo/NEAT_Buckland" :
-    "io/czlab/mcfud/algo/NEAT_CBullet"
-    ]();
+    const GA=window["io/czlab/mcfud/algo/NEAT"]();
     const Core= window["io/czlab/mcfud/core"]();
     const int=Math.floor;
 
     GA.configParams({
-      sigmoid:function(x){
+      actFunc:function(x){
         let a=Math.exp(x), b= Math.exp(-x);
 				return (a-b)/(a+b);
       }
@@ -341,9 +339,10 @@
             this.bestCurScore=0;
             this.interval = 0;
             if(!skip){
-              this.cars = this.neatObj.epoch(this.cars.reduce((acc,s)=>{
+              this.neatObj.epoch(this.cars.reduce((acc,s)=>{
                 return acc.push(s.g.score) && _S.remove(s) && acc
-              }, [])).map(g=> Car(self,K,g));
+              }, []));
+              this.cars= this.neatObj.createPhenotypes().map(g=> Car(self,K,g));
             }
             _G.remaining=this.cars.reduce((acc,c)=> acc + (c.m5.dead?0:1),0);
           },

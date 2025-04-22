@@ -37,9 +37,19 @@
 
     ////////////////////////////////////////////////////////////////////////////
     const Core= window["io/czlab/mcfud/core"]();
-    const GA= window["io/czlab/mcfud/algo/NEAT_Buckland"]();
+    const GA= window["io/czlab/mcfud/algo/NEAT"]();
+
     const Params=GA.configParams({
-      sigmoid:function(x){
+
+      probAddLink: -99999,
+      probAddNode: -999999,
+      probCancelLink: -999999,
+
+      chanceAddLink: -99999,
+      chanceAddNode: -9999,
+      chanceRecurrent: -99999,
+
+      actFuncXX:function(x){
         let a=Math.exp(x), b= Math.exp(-x);
 				return (a-b)/(a+b);
       }
@@ -72,7 +82,7 @@
     const TWO_PI=Math.PI * 2;
     const ANGLE_LIMIT = 0.1;  // About 6 degrees
     const SPEED_LIMIT = 10;//2;    // 2 m/s  ( Apollo 17 landed ~ 6.7 feet/s velocity )
-    const GRAVITY=  1/150;//1/100;//1/60;//1.63/60;
+    const GRAVITY= 1/300;// 1/150;//1/100;//1/60;//1.63/60;
     const THRUST=  -4;//-2;// -10; 350
     const ROTATION= 3.0 / 60;
     const MASS= 100;
@@ -98,7 +108,7 @@
 
     const MAX_MUTATE_COUNT = MAX_ACTION_COUNT/2;
 
-    const INPUTS=5;
+    const INPUTS=3;
     const OUTPUTS=4;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -177,14 +187,19 @@
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     function calcScore(s){
-      let distX = Mojo.width/(1+Math.abs(_G.target.x - s.x));
-      let distY = Mojo.height/(1+Math.abs(_G.target.y - s.y));
+      let dx= Math.abs(_G.target.x-s.x);
+      let dy= Math.abs(_G.target.y-s.y);
+      let distX = Mojo.width/(1+dx);
+      let distY = Mojo.height/(1+dy);
       let speed = Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]);
       let fitAirTime = s.g.tickCount/(speed+1);
-      let rotFit = 1/(Math.abs(s.rotation)+1);
-      let distFromPad = Math.abs(_G.target.x - s.x);
-      if(!checkLanding(s,distFromPad,speed)){
-        s.g.score= distX + distY + 4 * fitAirTime + 400 * rotFit;
+      let rotFit = Math.abs(s.rotation);
+      let dist =Math.sqrt(dx*dx+dy*dy);
+      if(!checkLanding(s,dx,speed)){
+        s.g.score= 1000* distX + 1000* distY + 4 * fitAirTime - 500 * rotFit;
+        if(dist<100 && speed<5){
+          s.g.score += 5000;
+        }
       }
       return s.g.score;
     }
@@ -194,10 +209,13 @@
       _G.obstacles.find(o=>{
         if(_S.hit(o,s)){
           s.m5.dead=true;
+          s.g.score= -1500;
           if(o.m5.uuid=="landing_pad"){
             checkLanding(s,
                          Math.abs(_G.target.x - s.x),
                          Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]));
+            if(!s.g.landed) s.g.score=888;
+
           }
           return true;
         }
@@ -221,9 +239,9 @@
           s=_S.sprite(_S.frames("unmanned.png",w,w)),
           k= 0.6*_G.target.width/s.width;
       _S.centerAnchor(_S.scaleBy(s,k,k));
-      s.rotation= 0;//Math.PI;
-      s.m5.vel[0]=0;
-      s.m5.vel[1]=0;
+      s.rotation= _.rand();//0;//Math.PI;
+      s.m5.vel[0]=_.rand() * 2;
+      s.m5.vel[1]=_.rand() * 2;//0;
       s.m5.mass=MASS;
       s.m5.type=OBJ_SHIP;
       s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
@@ -235,10 +253,13 @@
         let dx= _G.target.x-s.x;
         let dy= _G.target.y-s.y;
         let dist=Math.sqrt(dx*dx+dy*dy);
-        return [
+        let speed= Math.sqrt(s.m5.vel[0]*s.m5.vel[0] + s.m5.vel[1]*s.m5.vel[1]);
+        return [ dist, speed, s.rotation ];
+        //return [ s.x, s.y, _G.target.x, _G.target.y, dist, s.m5.vel[0], s.m5.vel[1], s.rotation ];
+        if(0) return [
           _M.remap(dist,0,Mojo.height,0,1),
           _M.remap(Math.abs(_G.target.x - s.x),0,Mojo.width,0,1),
-          //_M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
+          _M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
           _M.remap(s.m5.vel[0], -1000,1000,-1,1),
           _M.remap(s.m5.vel[1], -1000,1000,-1,1),
           _M.remap(s.rotation,-TWO_PI, TWO_PI, -1, 1)
@@ -249,42 +270,41 @@
       };
       s.g.update=function(outputs, dt){
         if(this.landed){ return false; }
+        s.m5.vel[1] += GRAVITY;
         s.m5.showFrame(0);
-        if(outputs[1]>0.5){
-          //rotl
-            s.rotation -= ROTATION_PER_TICK;
-            if(s.rotation < -Math.PI){
-              s.rotation += TWO_PI;
-            }
-            //s.m5.vel[0] -= 1;
+        if(outputs[0]> 0.5){}
+        if(outputs[1]>0.5){//rotl
+          s.rotation -= ROTATION_PER_TICK; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
+          //s.m5.vel[0] -= 1;
         }
-        if(outputs[2]>0.5){
-          //rotr
-            s.rotation += ROTATION_PER_TICK;
-            if(s.rotation > TWO_PI){
-              s.rotation -= TWO_PI;
-            }
-            //s.m5.vel[0] += 1;
+        if(outputs[2]>0.5){//rotr
+          s.rotation += ROTATION_PER_TICK; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
+          //s.m5.vel[0] += 1;
         }
-        if(outputs[3]>0.5){
+        if(outputs[3]>0.5){//fire
             let a = THRUST_PER_TICK/s.m5.mass;
             s.m5.vel[0] += a * sin(s.rotation);
             s.m5.vel[1] += a * cos(s.rotation);
             this.showJet = true;
             s.m5.showFrame(1);
         }
-        s.m5.vel[1] += GRAVITY;
+        if(_M.fuzzyZero(s.m5.vel[0]) && !_M.fuzzyZero(_G.target.x-s.x)){
+          s.m5.vel[0] = _.rand()*2;
+        }
         s.x += s.m5.vel[0];
         s.y += s.m5.vel[1];
         this.tickCount += 1;
         this.showJet = false;
         if(s.x > Mojo.width){
+          s.g.score= -99999;
           s.m5.dead=true;
         }
         else if(s.x < 0){
+          s.g.score= -99999;
           s.m5.dead=true;
         }
         else if(s.y < -2*s.height){
+          s.g.score= -99999;
           s.m5.dead=true;
         }
         else if(testForImpact(s) && !this.landed){
@@ -303,14 +323,14 @@
             if(s.rotation < -Math.PI){
               s.rotation += TWO_PI;
             }
-            s.m5.vel[0] -= 1;
+            //s.m5.vel[0] -= 1;
             break;
           case 2://rotr
             s.rotation += ROTATION_PER_TICK;
             if(s.rotation > TWO_PI){
               s.rotation -= TWO_PI;
             }
-            s.m5.vel[0] += 1;
+            //s.m5.vel[0] += 1;
             break;
           case 3:
             let a = THRUST_PER_TICK/s.m5.mass;
@@ -338,7 +358,7 @@
           calcScore(s);
         }
       };
-      s.x=Mojo.width*0.3;
+      s.x=0;//Mojo.width*0.2;
       s.y=s.height/2;
       return self.insert(s,true);
     }
@@ -364,7 +384,7 @@
             this.swapEngine();
           },
           swapEngine(){
-            this.neatObj= new GA.NeatGA(POPSIZE, INPUTS, OUTPUTS);
+            this.neatObj= new GA.NeatGA(POPSIZE, INPUTS, OUTPUTS, {});
             this.ships.forEach(b=> _S.remove(b));
             this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
             this.resetNext(true);
@@ -373,9 +393,10 @@
             this.waitNextWave=30;
             this.bestCurScore=0;
             if(!skip){
-              this.ships = this.neatObj.epoch(this.ships.reduce((acc,s)=>{
+              this.neatObj.epoch(this.ships.reduce((acc,s)=>{
                 return acc.push(s.g.score) && _S.remove(s) && acc
-              }, [])).map(g=> Ship(self,K,g));
+              }, []));
+              this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
             }
           },
           tick(dt){
