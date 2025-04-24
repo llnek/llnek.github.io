@@ -36,24 +36,8 @@
            ute:_,is}=Mojo;
 
     ////////////////////////////////////////////////////////////////////////////
+    const DQL= window["io/czlab/mcfud/algo/DQL"]();
     const Core= window["io/czlab/mcfud/core"]();
-    const GA= window["io/czlab/mcfud/algo/NEAT"]();
-
-    const Params=GA.configParams({
-
-      probAddLink: -99999,
-      probAddNode: -999999,
-      probCancelLink: -999999,
-
-      chanceAddLink: -99999,
-      chanceAddNode: -9999,
-      chanceRecurrent: -99999,
-
-      actFuncXX:function(x){
-        let a=Math.exp(x), b= Math.exp(-x);
-				return (a-b)/(a+b);
-      }
-    });
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -69,59 +53,358 @@
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     const playClick=()=> Mojo.sound("click.mp3").play();
     const CLICK_DELAY=343;
-
-    const SPAWN_TIME= 90;
-
+    const STEP_DELAY= 150;
     const OBJ_SHIP=1;
     const OBJ_HILL=2;
     const OBJ_GROUND=4;
     const OBJ_SITE=8;
 
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    const CONST_ONE_DEGREE = Math.PI / 180;   // 1 degree in radians
-    const TWO_PI=Math.PI * 2;
-    const ANGLE_LIMIT = 0.1;  // About 6 degrees
-    const SPEED_LIMIT = 10;//2;    // 2 m/s  ( Apollo 17 landed ~ 6.7 feet/s velocity )
-    const GRAVITY= 1/300;// 1/150;//1/100;//1/60;//1.63/60;
-    const THRUST=  -4;//-2;// -10; 350
-    const ROTATION= 3.0 / 60;
-    const MASS= 100;
-
-    const ROT_L=1, ROT_R=2, FIRE_THRUST=3, FFALL= 4;
-    const ACTIONS=[ROT_L, ROT_R, FIRE_THRUST, FFALL];
-
-    const MAX_ACTION_COUNT = 50;//30;
     const BIG_NUMBER=9999999;
+    const OUTOFBD= -1000000;
 
-    const GRAVITY_PER_TICK=      GRAVITY;
-    const THRUST_PER_TICK=       THRUST;
-    const ROTATION_PER_TICK=     ROTATION;
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    const ACTIONS = ["L","R","U","D","Z"];
+    const DQLOpts={
+      SECS_PER_EPISODE: 30,
+      EPISODES: 250000,
+      MAX_STEPS: 450,
 
-    const ROTATION_TOLERANCE=     Math.PI/16;
-    const SPEED_TOLERANCE=        0.5;
-    const DIST_TOLERANCE=         10.0;
+      ALPHA: 0.8,
+      GAMMA: 0.9,
+      MAX_EPSILON: 0.002,//1.0,
+      MIN_EPSILON: 0.001,
+      DECAY_RATE: 0.00005
+    };
+    const COLS=20;
+    const ROWS=12;
 
-    const POPSIZE=              100;
-    const CHROMO_LENGTH= 100;//50;//         30;
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    function initQT(qt,env){
+      env.grid.forEach((g,i)=> {
+        qt.set(i, g=new Map()); ACTIONS.forEach(a=> g.set(a, 0)); });
+    }
+    function genQT(qt,env){
+      let row, col, m;
+      initQT(qt,env);
+      env.grid.forEach((g,s)=>{
+        m=qt.get(s); row=int(s/COLS);col=s%COLS;
+        m.set("D", 100);
+        if(col < _G.goal[1]) m.set("R", 100);
+        if(col > _G.goal[1]) m.set("L", 100);
+        if(g == "H"){ m.set("D",-5000); m.set("U",5000); }
+        if(g== "G"){
+          m.set("Z",BIGNUMBER);
+        }
+      });
+    }
 
-    const MAX_GENERATIONS_ALLOWED= 500;
+    ////////////////////////////////////////////////////////////////////////////
+    function _checkHit(t){ return _G.obstacles.find(o=> _S.hit(o,t)) }
+    ////////////////////////////////////////////////////////////////////////////
+    class GameEnv extends DQL.Environment{
+      #goalPos;
+      #grid;
+      #dim;
+      #pos;
+      #gx;
+      #gy;
+      get grid(){ return this.#grid }
+      constructor(COLS,ROWS, goal, options){
+        super(options);
+        this.#grid=_.fill(COLS*ROWS, ()=> ' ');
+        this.#dim=COLS;
+        let h=0, s=Ship(),pos= goal[0]*COLS + goal[1];
+        this.#gy=goal[0];
+        this.#gx=goal[1];
+        this.#grid[0]="S";
+        this.#grid[pos]= "G";
+        for(let row,col,g,i=0; i< this.#grid.length; ++i){
+          row=int(i/COLS);
+          col=i%COLS;
+          g=_G.grid[row][col];
+          s.x=(g.x1+g.x2)/2;
+          s.y=(g.y1+g.y2)/2;
+          if(_checkHit(s)){
+            this.#grid[i]="H";
+            ++h;
+          }
+        }
+        console.log(`Goal pos at row=${goal[0]},col=${goal[1]}, pos= ${pos}, holes=${h}`);
+      }
+      reset(){
+        return this.#pos=0;
+      }
+      actionSpace(){ return ACTIONS }
+      #applyAction(action){
+        let row= int(this.#pos /COLS);
+        let col= this.#pos % COLS;
+        let nr=row,nc=col,v, i=-1, reward=-100, done=0;
+        const OUTOFBD= -10000;
+        switch(action){
+          case "U":
+            nr=row-1;
+            if(row==0){ reward= OUTOFBD; }else{
+              i= nr*this.#dim + col;
+            }
+            break;
+          case "D":
+            nr=row+1;
+            if(row== this.#dim-1){ reward= OUTOFBD; }else{
+              i=nr*this.#dim + col;
+            }
+            break;
+          case "L":
+            nc=col-1;
+            if(col== 0){ reward= OUTOFBD;}else{
+              i=row * this.#dim + nc;
+            }
+            break;
+          case "R":
+            nc=col+1;
+            if(col== this.#dim-1) { reward= OUTOFBD; }else{
+              i= row * this.#dim + nc;
+            }
+            break;
+          case "Z":
+            break;
+        }
+        if(i<0){
+          reward=OUTOFBD;
+          done=-1;
+        }
+        if(i>=0){
+          v= this.#grid[i];
+          this.#pos= i;
+          if(v=="G"){
+            reward= 999999;
+            done=1;
+          }else{
+            let g= _G.grid[nr][nc];
+            let ox=_G.player.x;
+            let oy=_G.player.y;
+            _G.player.x= (g.x1+g.x2)/2;
+            _G.player.y= (g.y1+g.y2)/2;
+            if(_checkHit(_G.player)){
+              reward= -9999999;
+              done=-1;
+            }else{
+              reward = 100 * Mojo.height/(1+Math.abs(_G.target.y - _G.player.y)) +
+                       5000 * Mojo.width/(1+Math.abs(_G.target.x - _G.player.x));
+            }
+            _G.player.x=ox;
+            _G.player.y=oy;
+          }
+        }
+        return [reward, done];
+      }
+      getState(){
+        return this.#pos;
+      }
+      step(action){
+        const rc = this.#applyAction(action);
+        rc.unshift(this.#pos);
+        //[new_state, reward, done?]
+        return rc;
+      }
+    }
 
-    const MAX_MUTATE_COUNT = MAX_ACTION_COUNT/2;
+    ////////////////////////////////////////////////////////////////////////////
+    function Ship(){
+      let gz=_G.grid[0][0];
+      let w= _S.sprite("unmanned.png").height,
+          s=_S.sprite(_S.frames("unmanned.png",w,w));
+      s.width=gz.x2-gz.x1;
+      s.height=gz.y2-gz.y1;
+      _S.centerAnchor(s);
+      s.m5.type=OBJ_SHIP;
+      s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
+      s.x= _G.arena.x + (gz.x2-gz.x1)/2;
+      s.y= _G.arena.y + (gz.y2-gz.y1)/2;
+      s.g.value=0;
+      s.g.row=0;
+      s.g.col=0;
+      _G.playerOrigin=[s.x,s.y];
+      return _G.player=s;
+    }
 
-    const INPUTS=3;
-    const OUTPUTS=4;
+    ////////////////////////////////////////////////////////////////////////////
+    function moveAction(action, cs, ns){
+      let row=int(ns/COLS);
+      let col=ns%COLS;
+      let g= _G.grid[row][col];
+      _.assert(g, "bad row col index in moveAction");
+      let tx= (g.x1+g.x2)/2;
+      let ty= (g.y1+g.y2)/2;
+      switch(action){
+        case "L": break;
+        case "R": break;
+        case "U": break;
+          _G.player.m5.showFrame(1); break;
+        case "D": break;
+        case "Z": break;
+      }
+      if(_checkHit(_G.player)){
+        _G.player.m5.dead=true;
+      }else{
+        let z=_F.tweenXY(_G.player,_F.SMOOTH, tx, ty,30);
+        z.onComplete=()=>{
+          _G.player.m5.showFrame(0);
+        }
+      }
+      return true;
+    }
+
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    _Z.scene("PlayGame",{
+      setup(){
+        const self=this, K=Mojo.getScaleFactor();
+        function workFunc(){
+          let ns, reward, action, cs=_G.cs, done=0;
+          if(_G.winner){
+            return self.g.postEpisode(_G.winner);
+          }
+          if(_G.curStep < _G.maxSteps){
+            action= _G.agent.getAction(cs, _G.env.actionSpace());
+            console.log(`Got new action === ${action}`);
+            [ns, reward, done]= _G.env.step(action);
+            _G.agent.updateQValue(cs, action, ns, reward);
+            _G.mem.push([cs,action,ns, reward]);
+            _G.cs=ns;
+            _G.curStep += 1;
+            if(cs != ns){
+              moveAction(action, cs, ns);
+            }
+          }
+          if(_G.player.m5.dead){
+            _G.winner="loser";
+          }else if(done > 0){
+            _G.winner= "winner";
+          }else if(done<0){
+            _G.winner="loser";
+          }else if(_G.curStep>=_G.maxSteps){
+            _G.winner= "timed-out";
+          }
+          if(_G.winner){
+            //ended one episode
+            self.future(workFunc, STEP_DELAY*1.5);
+          }else{
+            self.future(workFunc, STEP_DELAY);
+          }
+        }
+        //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        _.inject(this.g,{
+          initTerrain(){ Terrain(self,K,[]) },
+          initLevel(){
+            let out={}, grid=_S.gridXY([COLS,ROWS],0.9,0.9,out);
+            let gfx=_S.graphics();
+            _G.grid=grid;
+            _G.arena=out;
+            //_S.drawGridBox(out,1,"white",gfx);
+            _S.drawGridLines(0,0,grid,1,{color:"white",alpha:0},gfx);
+            self.insert(gfx);
+            this.waitNextWave=0;
+            grid.find((r,i)=> r.find((c,j)=>{
+              if(_G.target.x>= c.x1 && _G.target.x<= c.x2 &&
+                _G.target.y>= c.y1 && _G.target.y<= c.y2){
+                _G.goal=[i,j];
+                return true;
+              }
+            }));
+            let env= new GameEnv(COLS,ROWS,_G.goal, DQLOpts);
+            let vars=env.getVars();
+            let agent= new DQL.QLAgent(vars.ALPHA,vars.GAMMA, vars.MIN_EPSILON,vars.MAX_EPSILON,vars.DECAY_RATE, {
+              qtableCtor:function(qt){
+                genQT(qt,env)
+              },
+              randActionFunc:function(arr){
+                let pos;
+                if(_.rand()< 0.5){
+                  pos= _.rand() < 0.5 ? 0 : 3
+                }else{
+                  pos= _.rand() < 0.5 ? 1 : 2
+                }
+                return ACTIONS[pos];
+              }
+            });
+            _G.totalEpisodes= vars.EPISODES;
+            _G.maxSteps= vars.MAX_STEPS;
+            _G.agent= agent;
+            _G.env= env;
+            _G.curStep=0;
+            _G.episodeCount=0;
+            self.insert(Ship());
+          },
+          tick(dt){
+            if(this.waitNextWave>0){
+              --this.waitNextWave;
+              if(this.waitNextWave==0){
+                //do this once each episode
+                _G.cs= _G.env.reset();
+                _G.winner=null;
+                _G.curStep=0;
+                _G.mem=[];
+                self.future(workFunc, STEP_DELAY);
+              }
+            }
+          },
+          onNewGame(){
+            _.delay(CLICK_DELAY,()=>  _Z.run("PlayGame"));
+          },
+          postEpisode(reason){
+            if(reason=="winner"){
+              console.log(`Success!!!! @episode ${_G.episodeCount}`);
+              console.log(_G.agent.prnQTable());
+              return this.onNewGame();
+            }
+            //console.log(_G.mem.reduce((acc,m)=> acc + `[${m[0]}, ${m[1]}, ${m[2]}, ${m[3]}]`, ""));
+            console.log(`Failed!!!! @episode ${_G.episodeCount}`);
+            _G.agent.decayEpsilon(_G.episodeCount);
+            if(++_G.episodeCount < _G.totalEpisodes){
+              this.resetNext();
+            }else{
+              console.log(`Ran out of episodes ${_G.episodeCount}`);
+              this.onNewGame();
+            }
+          },
+          resetNext(skip){
+            this.waitNextWave=30;
+            _G.player.m5.dead=false;
+            _G.winner=null;
+            //_G.player.m5.showFrame(0);
+            if(!skip){
+              _//G.player=Ship();
+              _G.player.x = _G.playerOrigin[0];
+              _G.player.y= _G.playerOrigin[1];
+            }
+          }
+        });
+
+        //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+        _Z.run("StarfieldBg",{static:true});
+        this.g.initTerrain();
+        this.g.initLevel();
+        this.g.resetNext(true);
+        this.insert(this.g.genText=_S.bmpText("",UI_FONT,12*K));
+      },
+      dispose(){
+      },
+      postUpdate(dt){
+        this.g.tick(dt);
+        this.g.genText.text= `Generation: ${_G.episodeCount+1} - Step: ${_G.curStep+1}`;
+      }
+    });
 
     ////////////////////////////////////////////////////////////////////////////
     function Terrain(self,K,out){
       let maxH=int(Mojo.height*0.4);
       let minH= int(maxH*0.25);
       let hoffset=10*K;
-      let s,pad=4,N=10;
+      let s,pad=6,N=10;
       let w=Mojo.width/N;
       let vcolor=_S.color("#906908");
       let pcolor=_S.color("#cbcb02");
-      let T=[0.1,0.24,0.24,0.24,0.24,0.24,0.35,0.35,0.35,0.35];
-      let V=[0,0,0.2,0.5,0,0.7,0.7,1.2,1.2,0];
+      let T=[0.1,0.24,0.24,0.24,0.24,0.24,0.25,0.25,0.25,0.25];
+      let V=[0,0,0.2,0.5,0,0.3,0.0,1.2,1.2,0];
       _.assert(V.length==T.length && T.length==N,"bad terrain");
       for(let h, i=0;i<N;++i){
         h=T[i]* maxH;
@@ -172,273 +455,6 @@
         target:ps
       });
     }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function checkLanding(s,dist,speed){
-      if(dist< DIST_TOLERANCE &&
-         speed < SPEED_TOLERANCE &&
-         Math.abs(rotation) < ROTATION_TOLERANCE){
-        s.g.score= BIG_NUMBER;
-        s.g.landed=true;
-        _G.winner=s;
-      }
-      return s.g.landed;
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function calcScore(s){
-      let dx= Math.abs(_G.target.x-s.x);
-      let dy= Math.abs(_G.target.y-s.y);
-      let distX = Mojo.width/(1+dx);
-      let distY = Mojo.height/(1+dy);
-      let speed = Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]);
-      let fitAirTime = s.g.tickCount/(speed+1);
-      let rotFit = Math.abs(s.rotation);
-      let dist =Math.sqrt(dx*dx+dy*dy);
-      if(!checkLanding(s,dx,speed)){
-        s.g.score= 1000* distX + 1000* distY + 4 * fitAirTime - 500 * rotFit;
-        if(dist<100 && speed<5){
-          s.g.score += 5000;
-        }
-      }
-      return s.g.score;
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function testForImpact(s){
-      _G.obstacles.find(o=>{
-        if(_S.hit(o,s)){
-          s.m5.dead=true;
-          s.g.score= -1500;
-          if(o.m5.uuid=="landing_pad"){
-            checkLanding(s,
-                         Math.abs(_G.target.x - s.x),
-                         Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]));
-            if(!s.g.landed) s.g.score=888;
-
-          }
-          return true;
-        }
-      });
-      return s.m5.dead;
-    }
-
-    function argMax(arr){
-      let max= -Infinity, pos= -1;
-      arr.forEach((v,i)=>{
-        if(v>max){
-          max=v;pos=i;
-        }
-      });
-      return [pos, max];
-    }
-    ////////////////////////////////////////////////////////////////////////////
-    /**/
-    function Ship(self,K,g){
-      let w= _S.sprite("unmanned.png").height,
-          s=_S.sprite(_S.frames("unmanned.png",w,w)),
-          k= 0.6*_G.target.width/s.width;
-      _S.centerAnchor(_S.scaleBy(s,k,k));
-      s.rotation= _.rand();//0;//Math.PI;
-      s.m5.vel[0]=_.rand() * 2;
-      s.m5.vel[1]=_.rand() * 2;//0;
-      s.m5.mass=MASS;
-      s.m5.type=OBJ_SHIP;
-      s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
-      s.g.brain=g;
-      s.g.score=0;
-      s.g.tickCount=0;
-      s.g.landed=false;
-      s.g.look=function(){
-        let dx= _G.target.x-s.x;
-        let dy= _G.target.y-s.y;
-        let dist=Math.sqrt(dx*dx+dy*dy);
-        let speed= Math.sqrt(s.m5.vel[0]*s.m5.vel[0] + s.m5.vel[1]*s.m5.vel[1]);
-        return [ dist, speed, s.rotation ];
-        //return [ s.x, s.y, _G.target.x, _G.target.y, dist, s.m5.vel[0], s.m5.vel[1], s.rotation ];
-        if(0) return [
-          _M.remap(dist,0,Mojo.height,0,1),
-          _M.remap(Math.abs(_G.target.x - s.x),0,Mojo.width,0,1),
-          _M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
-          _M.remap(s.m5.vel[0], -1000,1000,-1,1),
-          _M.remap(s.m5.vel[1], -1000,1000,-1,1),
-          _M.remap(s.rotation,-TWO_PI, TWO_PI, -1, 1)
-        ];
-      };
-      s.g.think=function(inputs){
-        return s.g.brain.update(inputs);
-      };
-      s.g.update=function(outputs, dt){
-        if(this.landed){ return false; }
-        s.m5.vel[1] += GRAVITY;
-        s.m5.showFrame(0);
-        if(outputs[0]> 0.5){}
-        if(outputs[1]>0.5){//rotl
-          s.rotation -= ROTATION_PER_TICK; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
-          //s.m5.vel[0] -= 1;
-        }
-        if(outputs[2]>0.5){//rotr
-          s.rotation += ROTATION_PER_TICK; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
-          //s.m5.vel[0] += 1;
-        }
-        if(outputs[3]>0.5){//fire
-            let a = THRUST_PER_TICK/s.m5.mass;
-            s.m5.vel[0] += a * sin(s.rotation);
-            s.m5.vel[1] += a * cos(s.rotation);
-            this.showJet = true;
-            s.m5.showFrame(1);
-        }
-        if(_M.fuzzyZero(s.m5.vel[0]) && !_M.fuzzyZero(_G.target.x-s.x)){
-          s.m5.vel[0] = _.rand()*2;
-        }
-        s.x += s.m5.vel[0];
-        s.y += s.m5.vel[1];
-        this.tickCount += 1;
-        this.showJet = false;
-        if(s.x > Mojo.width){
-          s.g.score= -99999;
-          s.m5.dead=true;
-        }
-        else if(s.x < 0){
-          s.g.score= -99999;
-          s.m5.dead=true;
-        }
-        else if(s.y < -2*s.height){
-          s.g.score= -99999;
-          s.m5.dead=true;
-        }
-        else if(testForImpact(s) && !this.landed){
-          calcScore(s);
-        }
-      };
-      s.g.updateZZZ=function(outputs, dt){
-        let [pos,val]= argMax(outputs);
-        if(this.landed){ return false; }
-        s.m5.showFrame(0);
-        switch(pos){
-          case 0:
-            break;
-          case 1://rotl
-            s.rotation -= ROTATION_PER_TICK;
-            if(s.rotation < -Math.PI){
-              s.rotation += TWO_PI;
-            }
-            //s.m5.vel[0] -= 1;
-            break;
-          case 2://rotr
-            s.rotation += ROTATION_PER_TICK;
-            if(s.rotation > TWO_PI){
-              s.rotation -= TWO_PI;
-            }
-            //s.m5.vel[0] += 1;
-            break;
-          case 3:
-            let a = THRUST_PER_TICK/s.m5.mass;
-            s.m5.vel[0] += a * sin(s.rotation);
-            s.m5.vel[1] += a * cos(s.rotation);
-            this.showJet = true;
-            s.m5.showFrame(1);
-            break;
-        }
-        s.m5.vel[1] += GRAVITY;
-        s.x += s.m5.vel[0];
-        s.y += s.m5.vel[1];
-        this.tickCount += 1;
-        this.showJet = false;
-        if(s.x > Mojo.width){
-          s.m5.dead=true;
-        }
-        else if(s.x < 0){
-          s.m5.dead=true;
-        }
-        else if(s.y < -2*s.height){
-          s.m5.dead=true;
-        }
-        else if(testForImpact(s) && !this.landed){
-          calcScore(s);
-        }
-      };
-      s.x=0;//Mojo.width*0.2;
-      s.y=s.height/2;
-      return self.insert(s,true);
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    _Z.scene("PlayGame",{
-      setup(){
-        const self=this,
-              K=Mojo.getScaleFactor();
-        //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        _.inject(this.g,{
-          initTerrain(){
-            Terrain(self,K,[])
-          },
-          isItEnd(){
-            return _G.winner || this.ships.every(b=> b.m5.dead)
-          },
-          initLevel(){
-            this.spawnInterval = SPAWN_TIME;
-            this.waitNextWave=0;
-            this.bestCurScore=0;
-            this.ships=[];
-            this.swapEngine();
-          },
-          swapEngine(){
-            this.neatObj= new GA.NeatGA(POPSIZE, INPUTS, OUTPUTS, {});
-            this.ships.forEach(b=> _S.remove(b));
-            this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
-            this.resetNext(true);
-          },
-          resetNext(skip){
-            this.waitNextWave=30;
-            this.bestCurScore=0;
-            if(!skip){
-              this.neatObj.epoch(this.ships.reduce((acc,s)=>{
-                return acc.push(s.g.score) && _S.remove(s) && acc
-              }, []));
-              this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
-            }
-          },
-          tick(dt){
-            if(this.waitNextWave>0){
-              --this.waitNextWave;
-            }else if(!_G.winner){
-              this.doMoreTick(dt);
-            }
-          },
-          doMoreTick(dt){
-            this.bestCurScore=0;
-            for(let b,i=0;i<this.ships.length;++i){
-              b=this.ships[i];
-              if(b.m5.dead){
-                b.visible=false;
-              }else{
-                b.g.update(b.g.think(b.g.look()),dt);
-                if(b.g.score>this.bestCurScore){
-                  this.bestCurScore=b.g.score;
-                }
-              }
-              if(_G.winner){
-                break;
-              }
-            }
-            this.isItEnd() ? this.resetNext() : 0;
-          }
-        });
-        //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-        _Z.run("StarfieldBg",{static:true});
-        this.g.initTerrain();
-        this.g.initLevel();
-        this.g.genText=_S.bmpText("",UI_FONT,12*K);
-        this.insert(this.g.genText);
-      },
-      dispose(){
-      },
-      postUpdate(dt){
-        this.g.tick(dt);
-        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} - Score: ${this.g.bestCurScore}`;
-      }
-    });
 
     _Z.run("Splash", SplashCfg);
   }

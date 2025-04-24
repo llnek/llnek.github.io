@@ -36,11 +36,11 @@
            ute:_,is}=Mojo;
 
     ////////////////////////////////////////////////////////////////////////////
+    const GA= window["io/czlab/mcfud/algo/ChromoGA"]();
+    const NN= window["io/czlab/mcfud/algo/NNet"]();
     const Core= window["io/czlab/mcfud/core"]();
-    const GA= window["io/czlab/mcfud/algo/ChromoGA"](Core);
 
     const Params=GA.config({
-      //mutationRate: 0.01
     });
 
     ////////////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@
     const TWO_PI=Math.PI * 2;
     const ANGLE_LIMIT = 0.1;  // About 6 degrees
     const SPEED_LIMIT = 10;//2;    // 2 m/s  ( Apollo 17 landed ~ 6.7 feet/s velocity )
-    const GRAVITY=  1/150;//1/100;//1/60;//1.63/60;
+    const GRAVITY= 1/300;// 1/150;//1/100;//1/60;//1.63/60;
     const THRUST=  -4;//-2;// -10; 350
     const ROTATION= 3.0 / 60;
     const MASS= 100;
@@ -96,70 +96,8 @@
 
     const MAX_MUTATE_COUNT = MAX_ACTION_COUNT/2;
 
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    class Gene{
-      constructor(action,count){
-        this.action = action || _.randItem(ACTIONS);
-        this.count = count || _.randInt2(1, MAX_ACTION_COUNT);
-      }
-      eq(other){
-        return this.action==other.action && this.count == other.count;
-      }
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    class Chromo extends GA.ChromoNumero {
-      constructor(numActions,calc,target){
-        super((function(){
-          return _.fill(numActions, ()=> new Gene())
-        }()), calc, target);
-      }
-      clone(){
-				let [f,t]= this.getScoreCalcInfo();
-				return new Chromo(this.copyGenes(), f, t);
-			}
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function create(arg){
-      function calcFit(){ return 0 }
-      return arg ? new Chromo(arg,calcFit) :
-                   new Chromo(CHROMO_LENGTH, calcFit);
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function mutate(genes){
-      genes.forEach(g=>{
-        if(_.rand() < Params.mutationRate)
-          g.action = _.randItem(ACTIONS);
-        if(_.rand() < Params.mutationRate/2){
-          g.count = _M.clamp(0, MAX_MUTATE_COUNT, g.count + _.randMinus1To1()*MAX_MUTATE_COUNT);
-        }
-      })
-    }
-
-    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function crossOver(mum, dad){
-      let b1,b2;
-      if(_.rand() > Params.crossOverRate || mum === dad){
-        b1 = mum.copyGenes();
-        b2 = dad.copyGenes();
-      }else{
-        let swap= _.rand() * mum.size();
-        b1=[];
-        b2=[];
-        for(let i=0; i < mum.size(); ++i){
-          if(_.rand()<swap){
-            b1.push(dad[i]);
-            b2.push(mum[i]);
-          }else{
-            b1.push(mum.getGeneAt(i));
-            b2.push(dad.getGeneAt(i));
-          }
-        }
-      }
-      return [b1,b2];
-    }
+    const INPUTS=3;
+    const OUTPUTS=4;
 
     ////////////////////////////////////////////////////////////////////////////
     function Terrain(self,K,out){
@@ -237,13 +175,20 @@
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     function calcScore(s){
-      let distFromPad = Math.abs(_G.target.x - s.x);
-      let distFit = Mojo.width - distFromPad;
+      let dx= Math.abs(_G.target.x-s.x);
+      let dy= Math.abs(_G.target.y-s.y);
+      let distX = Mojo.width/(1+dx);
+      let distY = Mojo.height/(1+dy);
       let speed = Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]);
-      let rotFit = 1/(Math.abs(s.rotation)+1);
       let fitAirTime = s.g.tickCount/(speed+1);
-      if(!checkLanding(s,distFromPad,speed)){
-        s.g.score= distFit + 400*rotFit + 4* fitAirTime;
+      let rotFit = Math.abs(Math.PI/4 - s.rotation);
+      let speedFit= Math.abs(3*GRAVITY - speed);
+      let dist =Math.sqrt(dx*dx+dy*dy);
+      if(!checkLanding(s,dx,speed)){
+        s.g.score= 1000* distX + 1000* distY + 4 * fitAirTime - 500 * rotFit - 1000*speedFit;
+        if(dist<100 && speed<2*GRAVITY){
+          s.g.score += 5000;
+        }
       }
       return s.g.score;
     }
@@ -253,10 +198,13 @@
       _G.obstacles.find(o=>{
         if(_S.hit(o,s)){
           s.m5.dead=true;
+          s.g.score= -1500;
           if(o.m5.uuid=="landing_pad"){
             checkLanding(s,
                          Math.abs(_G.target.x - s.x),
                          Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]));
+            if(!s.g.landed) s.g.score=888;
+
           }
           return true;
         }
@@ -264,6 +212,15 @@
       return s.m5.dead;
     }
 
+    function argMax(arr){
+      let max= -Infinity, pos= -1;
+      arr.forEach((v,i)=>{
+        if(v>max){
+          max=v;pos=i;
+        }
+      });
+      return [pos, max];
+    }
     ////////////////////////////////////////////////////////////////////////////
     /**/
     function Ship(self,K,g){
@@ -271,71 +228,165 @@
           s=_S.sprite(_S.frames("unmanned.png",w,w)),
           k= 0.6*_G.target.width/s.width;
       _S.centerAnchor(_S.scaleBy(s,k,k));
-      s.rotation= 0;//Math.PI;
-      s.m5.vel[0]=0;
-      s.m5.vel[1]=0;
+      s.rotation= _.rand();//0;//Math.PI;
+      s.m5.vel[0]=_.rand() * 2;
+      s.m5.vel[1]=_.rand() * 2;//0;
       s.m5.mass=MASS;
       s.m5.type=OBJ_SHIP;
       s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
-      s.g.actions=[];
-      s.g.brain=g;
+      s.g.brain=g.getGeneAt(0);
       s.g.score=0;
       s.g.tickCount=0;
       s.g.landed=false;
-      g.iterGenes((a)=>{
-        for(let i=0;i<a.count;++i) s.g.actions.push(a.action);
-      });
-      s.g.update=function(dt){
-        let next;
+      s.g.look=function(){
+        let dx= _G.target.x-s.x;
+        let dy= _G.target.y-s.y;
+        let dist=Math.sqrt(dx*dx+dy*dy);
+        let speed= Math.sqrt(s.m5.vel[0]*s.m5.vel[0] + s.m5.vel[1]*s.m5.vel[1]);
+        return [ dist, speed, s.rotation ];
+        //return [ s.x, s.y, _G.target.x, _G.target.y, dist, s.m5.vel[0], s.m5.vel[1], s.rotation ];
+        if(0) return [
+          _M.remap(dist,0,Mojo.height,0,1),
+          _M.remap(Math.abs(_G.target.x - s.x),0,Mojo.width,0,1),
+          _M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
+          _M.remap(s.m5.vel[0], -1000,1000,-1,1),
+          _M.remap(s.m5.vel[1], -1000,1000,-1,1),
+          _M.remap(s.rotation,-TWO_PI, TWO_PI, -1, 1)
+        ];
+      };
+      s.g.think=function(inputs){
+        return s.g.brain.update(inputs);
+      };
+      s.g.update=function(outputs, dt){
         if(this.landed){ return false; }
-        if(this.tickCount >= this.actions.length){
-          next=FFALL;
-        }else{
-          next=this.actions[this.tickCount++];
-        }
         s.m5.vel[1] += GRAVITY;
-        s.x += s.m5.vel[0];
-        s.y += s.m5.vel[1];
-        this.tickCount += 1;
-        this.showJet = false;
-        switch(next){
-          case ROT_L:
-            s.rotation -= ROTATION_PER_TICK;
-            if(s.rotation < -Math.PI){
-              s.rotation += TWO_PI;
-            }
-            s.m5.showFrame(0);
-            break;
-          case ROT_R:
-            s.rotation += ROTATION_PER_TICK;
-            if(s.rotation > TWO_PI){
-              s.rotation -= TWO_PI;
-            }
-            s.m5.showFrame(0);
-            break;
-          case FIRE_THRUST:
+        s.m5.showFrame(0);
+        if(outputs[0]> 0.5){}
+        if(outputs[1]>0.5){//rotl
+          s.rotation -= ROTATION_PER_TICK; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
+          //s.m5.vel[0] -= 1;
+        }
+        if(outputs[2]>0.5){//rotr
+          s.rotation += ROTATION_PER_TICK; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
+          //s.m5.vel[0] += 1;
+        }
+        if(outputs[3]>0.5){//fire
             let a = THRUST_PER_TICK/s.m5.mass;
             s.m5.vel[0] += a * sin(s.rotation);
             s.m5.vel[1] += a * cos(s.rotation);
             this.showJet = true;
             s.m5.showFrame(1);
-            break;
-          default:
-            s.m5.showFrame(0);
-            break;
         }
-        s.m5.vel[1] += GRAVITY_PER_TICK;
+        if(_M.fuzzyZero(s.m5.vel[0]) && !_M.fuzzyZero(_G.target.x-s.x)){
+          s.m5.vel[0] = _.rand()*2;
+        }
         s.x += s.m5.vel[0];
         s.y += s.m5.vel[1];
-        if(s.x > Mojo.width){ s.x = 0 }
-        if(s.x < 0){ s.x = Mojo.width }
-        if(testForImpact(s) && !this.landed){
+        this.tickCount += 1;
+        this.showJet = false;
+        if(s.x > Mojo.width){
+          s.g.score= -99999;
+          s.m5.dead=true;
+        }
+        else if(s.x < 0){
+          s.g.score= -99999;
+          s.m5.dead=true;
+        }
+        else if(s.y < -2*s.height){
+          s.g.score= -99999;
+          s.m5.dead=true;
+        }
+        else if(testForImpact(s) && !this.landed){
           calcScore(s);
         }
       };
-      s.x=Mojo.width*0.3;
+      s.x=0;//Mojo.width*0.2;
       s.y=s.height/2;
       return self.insert(s,true);
+    }
+
+		class ChromoNNet extends GA.Chromosome{
+			#score;
+			constructor(nn, calc, target){
+				super(nn, calc, target);
+				this.recalcScore();
+			}
+			getScore(){ return this.#score }
+			updateScore(s){ this.#score=s; return this; }
+			cmpScore(s){ return this.#score>s ? 1 : (this.#score<s? -1 : 0) }
+			clone(){
+				let [f,t]= this.getScoreCalcInfo();
+				return new ChromoNNet(this.copyGenes(), f, t);
+			}
+      copyGenes(){
+        return [this.getGeneAt(0).clone()];
+      }
+			compareTo(other){
+				return this.cmpScore(other.getScore());
+			}
+    }
+
+    function calcFit(genes){
+      return 0;
+    }
+
+    function _crossOverFunc(p1,p2){
+      let a= p1.getGeneAt(0).toJSON();
+      let b= p2.getGeneAt(0).toJSON();
+      _.assert(a.nodes.length==b.nodes.length, "wrong count of nodes");
+      _.assert(a.links.length==b.links.length,"wrong count of links");
+      let b_links_sorted= a.links.reduce((acc,k)=>{
+        let g= b.links.find(o=> o.fromID==k.fromID && o.toID==k.toID);
+        _.assert(g, "expected link in the other ChromoNNet not found");
+        acc.push(g);
+        return acc;
+      },[]);
+      let len=a.links.length, cp= _.randInt2(0,len);
+      let b1=[],b2=[];
+      for(let i=0; i<cp; ++i){
+        b1.push(a.links[i]);
+        b2.push(b_links_sorted[i]);
+      }
+      for(let i=cp; i<len; ++i){
+        b1.push(b_links_sorted[i]);
+        b2.push(a.links[i]);
+      }
+      _.assert(b1.length==a.links.length, "bad crossed over link genes");
+      _.assert(b2.length==a.links.length, "bad crossed over link genes");
+      _.append(a.links,b1,true);
+      _.append(b.links,b2,true);
+      let new_a= [NN.NeuralNet.fromJSON(a)];
+      let new_b= [NN.NeuralNet.fromJSON(b)];
+      return [new_a, new_b];
+    }
+
+    function _createFunc(arg){
+      return arg ? new ChromoNNet(arg,calcFit) :
+        new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
+          layers:[
+            {size:2},{size:2}
+          ]
+        })],calcFit);
+    }
+
+    function _mutateFunc(genes){
+      if(_.rand() < Params.mutationRate){}else{return}
+      let nn= genes[0];
+      let fa, fb;
+      nn.iterNodes((n)=>{
+        if(_.rand() < Params.mutationRate && !fa){
+          n.setBias(_.randMinus1To1());
+          fa=true;
+        }
+        if(_.rand() < Params.mutationRate && !fb){
+          n.iterOutLinks((k)=>{
+            if (_.rand()< Params.mutationRate){
+              k.weight=_.randMinus1To1();
+              fb=true;
+            }
+          });
+        }
+      });
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -359,7 +410,11 @@
             this.swapEngine();
           },
           swapEngine(){
-            this.neatObj= new GA.ChromoGA(POPSIZE, {create, mutate, crossOver});
+            this.neatObj= new GA.ChromoGA(POPSIZE, {
+              create:_createFunc,
+              mutate:_mutateFunc,
+              crossOver:_crossOverFunc
+            });
             this.ships.forEach(b=> _S.remove(b));
             this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
             this.resetNext(true);
@@ -388,7 +443,7 @@
               if(b.m5.dead){
                 b.visible=false;
               }else{
-                b.g.update(dt);
+                b.g.update(b.g.think(b.g.look()),dt);
                 if(b.g.score>this.bestCurScore){
                   this.bestCurScore=b.g.score;
                 }
