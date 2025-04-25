@@ -71,7 +71,7 @@
 
       ALPHA: 0.8,
       GAMMA: 0.9,
-      MAX_EPSILON: 0.001,//0.2,//1.0,
+      MAX_EPSILON: 0.2,//1.0,
       MIN_EPSILON: 0.001,
       DECAY_RATE: 0.00005
     };
