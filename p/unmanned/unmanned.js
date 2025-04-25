@@ -71,12 +71,12 @@
 
       ALPHA: 0.8,
       GAMMA: 0.9,
-      MAX_EPSILON: 0.002,//1.0,
+      MAX_EPSILON: 0.001,//0.2,//1.0,
       MIN_EPSILON: 0.001,
       DECAY_RATE: 0.00005
     };
-    const COLS=20;
-    const ROWS=12;
+    const COLS=20
+    const ROWS=12
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     function initQT(qt,env){
@@ -89,9 +89,19 @@
       env.grid.forEach((g,s)=>{
         m=qt.get(s); row=int(s/COLS);col=s%COLS;
         m.set("D", 100);
-        if(col < _G.goal[1]) m.set("R", 100);
-        if(col > _G.goal[1]) m.set("L", 100);
-        if(g == "H"){ m.set("D",-5000); m.set("U",5000); }
+        if(col < _G.goal[1]) {
+          m.set("R", 100);
+        }
+        if(col > _G.goal[1]){
+          m.set("L", 100);
+        }
+        if(g == "H"){
+          let rrr=row-1;
+          let ppp=rrr*COLS+COLS;
+          let mmm= qt.get(ppp);
+          mmm.set("D", -5000); mmm.set("U",5000); mmm.set("L",0); mmm.set("R",0);
+          m.set("D",-5000); m.set("U",5000); m.set("L",0); m.set("R", 0);
+        }
         if(g== "G"){
           m.set("Z",BIGNUMBER);
         }
@@ -218,6 +228,7 @@
       _S.centerAnchor(s);
       s.m5.type=OBJ_SHIP;
       s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
+      s.m5.showFrame(0);
       s.x= _G.arena.x + (gz.x2-gz.x1)/2;
       s.y= _G.arena.y + (gz.y2-gz.y1)/2;
       s.g.value=0;
@@ -237,7 +248,9 @@
       let ty= (g.y1+g.y2)/2;
       switch(action){
         case "L": break;
+          _G.player.m5.showFrame(3); break;
         case "R": break;
+          _G.player.m5.showFrame(2); break;
         case "U": break;
           _G.player.m5.showFrame(1); break;
         case "D": break;
@@ -246,23 +259,18 @@
       if(_checkHit(_G.player)){
         _G.player.m5.dead=true;
       }else{
-        let z=_F.tweenXY(_G.player,_F.SMOOTH, tx, ty,30);
-        z.onComplete=()=>{
-          _G.player.m5.showFrame(0);
-        }
+        return [tx,ty];
       }
-      return true;
+
+      return UNDEF;
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     _Z.scene("PlayGame",{
       setup(){
         const self=this, K=Mojo.getScaleFactor();
-        function workFunc(){
-          let ns, reward, action, cs=_G.cs, done=0;
-          if(_G.winner){
-            return self.g.postEpisode(_G.winner);
-          }
+        function simulateRun(){
+          let rc, ns, reward, action, cs=_G.cs, done=0;
           if(_G.curStep < _G.maxSteps){
             action= _G.agent.getAction(cs, _G.env.actionSpace());
             console.log(`Got new action === ${action}`);
@@ -271,25 +279,37 @@
             _G.mem.push([cs,action,ns, reward]);
             _G.cs=ns;
             _G.curStep += 1;
-            if(cs != ns){
-              moveAction(action, cs, ns);
-            }
+            if(cs != ns) rc= moveAction(action, cs, ns);
           }
-          if(_G.player.m5.dead){
-            _G.winner="loser";
-          }else if(done > 0){
+          if(_G.player.m5.dead){ done=-1; }
+          if(done > 0){
             _G.winner= "winner";
           }else if(done<0){
             _G.winner="loser";
-          }else if(_G.curStep>=_G.maxSteps){
+          }else if(_G.curStep>=_G.maxSteps || _G.path.length > 150){
             _G.winner= "timed-out";
           }
-          if(_G.winner){
-            //ended one episode
-            self.future(workFunc, STEP_DELAY*1.5);
-          }else{
-            self.future(workFunc, STEP_DELAY);
+          return _G.winner ? false : true;
+        }
+        function convertPath(row,col,g){
+          _.assert(_G.path[0]==0, "bad paths");
+          return _G.path.map(p=> {
+            row= int(p/COLS); col=p%COLS;
+            g=_G.grid[row][col];
+            return [(g.x1+g.x2)/2, (g.y1+g.y2)/2];
+          });
+        }
+        function tweenShip(self,wps){
+          function done(){
+            _.delay(CLICK_DELAY,()=>  self.g.postEpisode());
           }
+          if(wps.length<2){
+            return done();
+          }
+          let a= wps.shift();
+          let b= wps.shift();
+          let t= _F.tweenPath(_G.player,_F.SMOOTH, [a[0], b[0]], [a[1], b[1]], wps, 60);
+          t.onComplete=done;
         }
         //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         _.inject(this.g,{
@@ -343,15 +363,23 @@
                 _G.winner=null;
                 _G.curStep=0;
                 _G.mem=[];
-                self.future(workFunc, STEP_DELAY);
+                _G.path=[_G.cs];
+                _G.player.m5.showFrame(1);
+                while(simulateRun()){
+                  _G.path.push(_G.cs);
+                };
+                console.log(`path ==== ${JSON.stringify(_G.path)}, winner = ${_G.winner}`);
+                tweenShip(self,convertPath());
+                //_G.waypts= convertPath();
+                //console.log(`path ==== ${JSON.stringify(_G.waypts)}`);
               }
             }
           },
           onNewGame(){
             _.delay(CLICK_DELAY,()=>  _Z.run("PlayGame"));
           },
-          postEpisode(reason){
-            if(reason=="winner"){
+          postEpisode(){
+            if(_G.winner=="winner"){
               console.log(`Success!!!! @episode ${_G.episodeCount}`);
               console.log(_G.agent.prnQTable());
               return this.onNewGame();
@@ -390,7 +418,8 @@
       },
       postUpdate(dt){
         this.g.tick(dt);
-        this.g.genText.text= `Generation: ${_G.episodeCount+1} - Step: ${_G.curStep+1}`;
+        //this.g.genText.text= `Generation: ${_G.episodeCount+1} - Step: ${_G.curStep+1}`;
+        this.g.genText.text= `Generation: ${_G.episodeCount+1}`;
       }
     });
 
