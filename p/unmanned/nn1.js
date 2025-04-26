@@ -151,7 +151,7 @@
     function checkLanding(s,dist,speed){
       if(dist< DIST_TOLERANCE &&
          speed < SPEED_TOLERANCE &&
-         Math.abs(rotation) < ROTATION_TOLERANCE){
+         Math.abs(s.rotation) < ROTATION_TOLERANCE){
         s.g.score= BIG_NUMBER;
         s.g.landed=true;
         _G.winner=s;
@@ -233,11 +233,9 @@
         s.m5.showFrame(0);
         if(outputs[0]> 0.5){}
         if(outputs[1]>0.5){//rotl
-          //s.rotation -= ROTATION; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
           s.rotation= (s.rotation + ROTATION) <= MAX_ROTATION ? ROTATION : Math.max(MAX_ROTATION - s.rotation, 0);
         }
         if(outputs[2]>0.5){//rotr
-          //s.rotation += ROTATION; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
           s.rotation= (s.rotation - ROTATION) >= -MAX_ROTATION ? -ROTATION : Math.max(-MAX_ROTATION + s.rotation, 0);
         }
         if(outputs[3]>0.5){//fire
