@@ -58,45 +58,31 @@
     const playClick=()=> Mojo.sound("click.mp3").play();
     const CLICK_DELAY=343;
 
-    const SPAWN_TIME= 90;
-
     const OBJ_SHIP=1;
     const OBJ_HILL=2;
     const OBJ_GROUND=4;
     const OBJ_SITE=8;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    const CONST_ONE_DEGREE = Math.PI / 180;   // 1 degree in radians
     const TWO_PI=Math.PI * 2;
-    const ANGLE_LIMIT = 0.1;  // About 6 degrees
-    const SPEED_LIMIT = 10;//2;    // 2 m/s  ( Apollo 17 landed ~ 6.7 feet/s velocity )
     const GRAVITY= 1/300;// 1/150;//1/100;//1/60;//1.63/60;
     const THRUST=  -4;//-2;// -10; 350
-    const ROTATION= 3.0 / 60;
+    const ROTATION= 3 / 60;
     const MASS= 100;
+    const MAX_ROTATION = Math.PI/2;
 
-    const ROT_L=1, ROT_R=2, FIRE_THRUST=3, FFALL= 4;
-    const ACTIONS=[ROT_L, ROT_R, FIRE_THRUST, FFALL];
+    const MAX_AIR_TIME=12600;//3.5mins
+    //const MAX_AIR_TIME=21600;//5mins
 
-    const MAX_ACTION_COUNT = 50;//30;
     const BIG_NUMBER=9999999;
 
-    const GRAVITY_PER_TICK=      GRAVITY;
-    const THRUST_PER_TICK=       THRUST;
-    const ROTATION_PER_TICK=     ROTATION;
-
     const ROTATION_TOLERANCE=     Math.PI/16;
-    const SPEED_TOLERANCE=        0.5;
-    const DIST_TOLERANCE=         10.0;
+    const SPEED_TOLERANCE=        1.5;
+    const DIST_TOLERANCE=         15.0;
 
-    const POPSIZE=              100;
-    const CHROMO_LENGTH= 100;//50;//         30;
+    const POPSIZE=30;
 
-    const MAX_GENERATIONS_ALLOWED= 500;
-
-    const MAX_MUTATE_COUNT = MAX_ACTION_COUNT/2;
-
-    const INPUTS=3;
+    const INPUTS=8;
     const OUTPUTS=4;
 
     ////////////////////////////////////////////////////////////////////////////
@@ -104,12 +90,12 @@
       let maxH=int(Mojo.height*0.4);
       let minH= int(maxH*0.25);
       let hoffset=10*K;
-      let s,pad=4,N=10;
+      let s,pad=5,N=10;
       let w=Mojo.width/N;
       let vcolor=_S.color("#906908");
       let pcolor=_S.color("#cbcb02");
       let T=[0.1,0.24,0.24,0.24,0.24,0.24,0.35,0.35,0.35,0.35];
-      let V=[0,0,0.2,0.5,0,0.7,0.7,1.2,1.2,0];
+      let V=[0,0,0.2,0.5,0,0.0,0.0,1.2,1.2,0];
       _.assert(V.length==T.length && T.length==N,"bad terrain");
       for(let h, i=0;i<N;++i){
         h=T[i]* maxH;
@@ -179,16 +165,16 @@
       let dy= Math.abs(_G.target.y-s.y);
       let distX = Mojo.width/(1+dx);
       let distY = Mojo.height/(1+dy);
-      let speed = Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]);
-      let fitAirTime = s.g.tickCount/(speed+1);
-      let rotFit = Math.abs(Math.PI/4 - s.rotation);
-      let speedFit= Math.abs(3*GRAVITY - speed);
-      let dist =Math.sqrt(dx*dx+dy*dy);
+      let speed = s.g.calcSpeed();
+      let fitAirTime = s.g.tickCount/MAX_AIR_TIME;
+      let rotFit = Math.abs(ROTATION_TOLERANCE  - s.rotation);
+      let speedFit= Math.abs(SPEED_TOLERANCE - speed);
+      let dist =s.g.calcDistToGo();
       if(!checkLanding(s,dx,speed)){
-        s.g.score= 1000* distX + 1000* distY + 4 * fitAirTime - 500 * rotFit - 1000*speedFit;
-        if(dist<100 && speed<2*GRAVITY){
-          s.g.score += 5000;
-        }
+        s.g.score= 1000* distX + 1000* distY - 5000 * fitAirTime - 5000 * rotFit - 5000*speedFit;
+      }
+      if(dist<100 && speed<2*SPEED_TOLERANCE){
+        s.g.score += 500000;
       }
       return s.g.score;
     }
@@ -198,13 +184,10 @@
       _G.obstacles.find(o=>{
         if(_S.hit(o,s)){
           s.m5.dead=true;
-          s.g.score= -1500;
+          s.g.score= -1500000;
           if(o.m5.uuid=="landing_pad"){
-            checkLanding(s,
-                         Math.abs(_G.target.x - s.x),
-                         Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]));
+            checkLanding(s, Math.abs(_G.target.x - s.x), s.g.calcSpeed());
             if(!s.g.landed) s.g.score=888;
-
           }
           return true;
         }
@@ -212,15 +195,6 @@
       return s.m5.dead;
     }
 
-    function argMax(arr){
-      let max= -Infinity, pos= -1;
-      arr.forEach((v,i)=>{
-        if(v>max){
-          max=v;pos=i;
-        }
-      });
-      return [pos, max];
-    }
     ////////////////////////////////////////////////////////////////////////////
     /**/
     function Ship(self,K,g){
@@ -228,9 +202,9 @@
           s=_S.sprite(_S.frames("unmanned.png",w,w)),
           k= 0.6*_G.target.width/s.width;
       _S.centerAnchor(_S.scaleBy(s,k,k));
-      s.rotation= _.rand();//0;//Math.PI;
+      s.rotation= Math.PI/3;
       s.m5.vel[0]=_.rand() * 2;
-      s.m5.vel[1]=_.rand() * 2;//0;
+      s.m5.vel[1]=0;
       s.m5.mass=MASS;
       s.m5.type=OBJ_SHIP;
       s.m5.cmask=OBJ_HILL | OBJ_GROUND | OBJ_SITE;
@@ -239,39 +213,35 @@
       s.g.tickCount=0;
       s.g.landed=false;
       s.g.look=function(){
-        let dx= _G.target.x-s.x;
-        let dy= _G.target.y-s.y;
-        let dist=Math.sqrt(dx*dx+dy*dy);
-        let speed= Math.sqrt(s.m5.vel[0]*s.m5.vel[0] + s.m5.vel[1]*s.m5.vel[1]);
-        return [ dist, speed, s.rotation ];
-        //return [ s.x, s.y, _G.target.x, _G.target.y, dist, s.m5.vel[0], s.m5.vel[1], s.rotation ];
-        if(0) return [
-          _M.remap(dist,0,Mojo.height,0,1),
-          _M.remap(Math.abs(_G.target.x - s.x),0,Mojo.width,0,1),
-          _M.remap(Math.abs(_G.target.y - s.y),0,Mojo.height,0,1),
-          _M.remap(s.m5.vel[0], -1000,1000,-1,1),
-          _M.remap(s.m5.vel[1], -1000,1000,-1,1),
-          _M.remap(s.rotation,-TWO_PI, TWO_PI, -1, 1)
-        ];
+        let dist=this.calcDistToGo();
+        let speed= this.calcSpeed();
+        return [ s.x/Mojo.width, s.y/Mojo.height, _G.target.x/Mojo.width, _G.target.y/Mojo.height, s.rotation, s.m5.vel[1], speed, dist ];
       };
       s.g.think=function(inputs){
         return s.g.brain.update(inputs);
       };
+      s.g.calcDistToGo=function(){
+        let x= Math.abs(_G.target.x-s.x),y=Math.abs(_G.target.y-s.y);
+        return Math.sqrt(x*x+y*y);
+      }
+      s.g.calcSpeed=function(){
+        return Math.sqrt(s.m5.vel[0]*s.m5.vel[0]+s.m5.vel[1]*s.m5.vel[1]);
+      }
       s.g.update=function(outputs, dt){
         if(this.landed){ return false; }
         s.m5.vel[1] += GRAVITY;
         s.m5.showFrame(0);
         if(outputs[0]> 0.5){}
         if(outputs[1]>0.5){//rotl
-          s.rotation -= ROTATION_PER_TICK; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
-          //s.m5.vel[0] -= 1;
+          //s.rotation -= ROTATION; if(s.rotation < -Math.PI){ s.rotation += TWO_PI; }
+          s.rotation= (s.rotation + ROTATION) <= MAX_ROTATION ? ROTATION : Math.max(MAX_ROTATION - s.rotation, 0);
         }
         if(outputs[2]>0.5){//rotr
-          s.rotation += ROTATION_PER_TICK; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
-          //s.m5.vel[0] += 1;
+          //s.rotation += ROTATION; if(s.rotation > TWO_PI){ s.rotation -= TWO_PI; }
+          s.rotation= (s.rotation - ROTATION) >= -MAX_ROTATION ? -ROTATION : Math.max(-MAX_ROTATION + s.rotation, 0);
         }
         if(outputs[3]>0.5){//fire
-            let a = THRUST_PER_TICK/s.m5.mass;
+            let a = THRUST/s.m5.mass;
             s.m5.vel[0] += a * sin(s.rotation);
             s.m5.vel[1] += a * cos(s.rotation);
             this.showJet = true;
@@ -292,19 +262,24 @@
           s.g.score= -99999;
           s.m5.dead=true;
         }
-        else if(s.y < -2*s.height){
+        else if(s.y < 0){
           s.g.score= -99999;
           s.m5.dead=true;
         }
-        else if(testForImpact(s) && !this.landed){
+        else if(s.g.tickCount >MAX_AIR_TIME){
+          //3 mins, too long
+          s.g.score= -999999;
+          s.m5.dead=true;
+        }else if(testForImpact(s) && !this.landed){
           calcScore(s);
         }
       };
-      s.x=0;//Mojo.width*0.2;
-      s.y=s.height/2;
+      s.x=Mojo.width*0.1;
+      s.y=s.height*1.2;
       return self.insert(s,true);
     }
 
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		class ChromoNNet extends GA.Chromosome{
 			#score;
 			constructor(nn, calc, target){
@@ -326,66 +301,45 @@
 			}
     }
 
-    function calcFit(genes){
-      return 0;
-    }
-
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     function _crossOverFunc(p1,p2){
       let a= p1.getGeneAt(0).toJSON();
       let b= p2.getGeneAt(0).toJSON();
-      _.assert(a.nodes.length==b.nodes.length, "wrong count of nodes");
-      _.assert(a.links.length==b.links.length,"wrong count of links");
-      let b_links_sorted= a.links.reduce((acc,k)=>{
-        let g= b.links.find(o=> o.fromID==k.fromID && o.toID==k.toID);
-        _.assert(g, "expected link in the other ChromoNNet not found");
-        acc.push(g);
-        return acc;
-      },[]);
-      let len=a.links.length, cp= _.randInt2(0,len);
-      let b1=[],b2=[];
-      for(let i=0; i<cp; ++i){
-        b1.push(a.links[i]);
-        b2.push(b_links_sorted[i]);
+      if(_.rand() < Params.crossOverRate){
+        let t, [p1,p2] = _.randSpan(a.nodes);
+        for(let i=p1; i<p2; ++i){
+          t= a.nodes[i].bias;
+          a.nodes[i].bias= b.nodes[i].bias;
+          b.nodes[i].bias=t;
+        }
       }
-      for(let i=cp; i<len; ++i){
-        b1.push(b_links_sorted[i]);
-        b2.push(a.links[i]);
-      }
-      _.assert(b1.length==a.links.length, "bad crossed over link genes");
-      _.assert(b2.length==a.links.length, "bad crossed over link genes");
-      _.append(a.links,b1,true);
-      _.append(b.links,b2,true);
       let new_a= [NN.NeuralNet.fromJSON(a)];
       let new_b= [NN.NeuralNet.fromJSON(b)];
       return [new_a, new_b];
     }
 
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    function calcFit(genes){ return 0; }
     function _createFunc(arg){
       return arg ? new ChromoNNet(arg,calcFit) :
         new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
           layers:[
-            {size:2},{size:2}
+            {size:20}
           ]
         })],calcFit);
     }
 
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    function _mutateValue(x){ return x*(1 + ((_.rand() - 0.5) * 3 + _.rand() - 0.5)); }
     function _mutateFunc(genes){
-      if(_.rand() < Params.mutationRate){}else{return}
       let nn= genes[0];
-      let fa, fb;
-      nn.iterNodes((n)=>{
-        if(_.rand() < Params.mutationRate && !fa){
-          n.setBias(_.randMinus1To1());
-          fa=true;
-        }
-        if(_.rand() < Params.mutationRate && !fb){
-          n.iterOutLinks((k)=>{
-            if (_.rand()< Params.mutationRate){
-              k.weight=_.randMinus1To1();
-              fb=true;
-            }
-          });
-        }
+      nn.iterNodes(n=>{
+        if(_.rand() < Params.mutationRate)
+          n.setBias(_mutateValue(n.getBias()));
+        n.iterOutLinks(k=>{
+          if(_.rand()< Params.mutationRate)
+            k.weight= _mutateValue(k.weight);
+        });
       });
     }
 
@@ -403,18 +357,10 @@
             return _G.winner || this.ships.every(b=> b.m5.dead)
           },
           initLevel(){
-            this.spawnInterval = SPAWN_TIME;
             this.waitNextWave=0;
             this.bestCurScore=0;
             this.ships=[];
-            this.swapEngine();
-          },
-          swapEngine(){
-            this.neatObj= new GA.ChromoGA(POPSIZE, {
-              create:_createFunc,
-              mutate:_mutateFunc,
-              crossOver:_crossOverFunc
-            });
+            this.neatObj= new GA.ChromoGA(POPSIZE, { create:_createFunc, mutate:_mutateFunc, crossOver:_crossOverFunc });
             this.ships.forEach(b=> _S.remove(b));
             this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
             this.resetNext(true);
