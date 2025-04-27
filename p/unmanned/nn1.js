@@ -272,6 +272,9 @@
           calcScore(s);
         }
       };
+      s.g.dbgBrain=function(){
+        console.log(`Best Brain===============================================>\n${JSON.stringify(this.brain.toJSON())}`);
+      };
       s.x=Mojo.width*0.1;
       s.y=s.height*1.2;
       return self.insert(s,true);
@@ -321,8 +324,10 @@
     function _createFunc(arg){
       return arg ? new ChromoNNet(arg,calcFit) :
         new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
+          XXactOut: "linear",
           layers:[
-            {size:20}
+            {size:64, XXactFunc: "relu"},
+            {size:64, XXactFunc: "relu"}
           ]
         })],calcFit);
     }
@@ -371,6 +376,7 @@
                 return acc.push(s.g.score) && _S.remove(s) && acc
               }, []));
               this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
+              this.ships[0].g.dbgBrain();
             }
           },
           tick(dt){
