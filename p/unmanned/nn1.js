@@ -378,7 +378,6 @@
                 return acc.push(s.g.score) && _S.remove(s) && acc
               }, []));
               this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
-              this.ships[0].g.dbgBrain();
             }
           },
           tick(dt){
@@ -401,6 +400,7 @@
                 }
               }
               if(_G.winner){
+                _G.winner.dbgBrain();
                 break;
               }
             }
@@ -418,7 +418,7 @@
       },
       postUpdate(dt){
         this.g.tick(dt);
-        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} // Score: ${this.g.bestCurScore}`;
+        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} /// Score: ${this.g.bestCurScore}`;
       }
     });
 
