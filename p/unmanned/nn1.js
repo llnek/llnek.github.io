@@ -400,7 +400,7 @@
                 }
               }
               if(_G.winner){
-                _G.winner.dbgBrain();
+                _G.winner.g.dbgBrain();
                 break;
               }
             }
