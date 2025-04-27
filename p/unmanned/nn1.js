@@ -154,6 +154,7 @@
          Math.abs(s.rotation) < ROTATION_TOLERANCE){
         s.g.score= BIG_NUMBER;
         s.g.landed=true;
+        s.m5.dead=false;
         _G.winner=s;
       }
       return s.g.landed;
@@ -273,7 +274,8 @@
         }
       };
       s.g.dbgBrain=function(){
-        console.log(`Best Brain===============================================>\n${JSON.stringify(this.brain.toJSON())}`);
+        if(this.landed)
+          console.log(`Best Brain===============================================>\n${JSON.stringify(this.brain.toJSON())}`);
       };
       s.x=Mojo.width*0.1;
       s.y=s.height*1.2;
@@ -357,7 +359,7 @@
             Terrain(self,K,[])
           },
           isItEnd(){
-            return _G.winner || this.ships.every(b=> b.m5.dead)
+            return this.ships.every(b=> b.m5.dead)
           },
           initLevel(){
             this.waitNextWave=0;
@@ -402,7 +404,7 @@
                 break;
               }
             }
-            this.isItEnd() ? _.delay(0,()=> this.resetNext()) : 0;
+            _G.winner ? 0 : ( this.isItEnd() ? _.delay(0,()=> this.resetNext()) : 0);
           }
         });
         //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -416,7 +418,7 @@
       },
       postUpdate(dt){
         this.g.tick(dt);
-        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} / Score: ${this.g.bestCurScore}`;
+        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} // Score: ${this.g.bestCurScore}`;
       }
     });
 
