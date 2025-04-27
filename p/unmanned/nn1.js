@@ -366,7 +366,7 @@
             this.neatObj= new GA.ChromoGA(POPSIZE, { create:_createFunc, mutate:_mutateFunc, crossOver:_crossOverFunc });
             this.ships.forEach(b=> _S.remove(b));
             this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
-            this.resetNext(true);
+            _.delay(0,()=> this.resetNext(true));
           },
           resetNext(skip){
             this.waitNextWave=30;
@@ -402,7 +402,7 @@
                 break;
               }
             }
-            this.isItEnd() ? this.resetNext() : 0;
+            this.isItEnd() ? _.delay(0,()=> this.resetNext()) : 0;
           }
         });
         //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -416,7 +416,7 @@
       },
       postUpdate(dt){
         this.g.tick(dt);
-        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} - Score: ${this.g.bestCurScore}`;
+        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} / Score: ${this.g.bestCurScore}`;
       }
     });
 
