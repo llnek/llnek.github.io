@@ -40,10 +40,16 @@
     const NN= window["io/czlab/mcfud/algo/NNet"]();
     const Core= window["io/czlab/mcfud/core"]();
 
+    const {TRAINED_NNET}= window["io/czlab/llnek-github-io/p/unmanned/data"]();
+    const TRAINED_NNET_STR= JSON.stringify(TRAINED_NNET);
+    const C_ORANGE=_S.color("#f4d52b");
     const Params=GA.config({
     });
 
+
     ////////////////////////////////////////////////////////////////////////////
+
+    var GameMode=0;
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     const
@@ -51,7 +57,7 @@
       SplashCfg= {
         title:"Unmanned Lander",
         clickSnd:"click.mp3",
-        action: {name:"PlayGame"}
+        action: {name:"MainMenu"}
       };
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -322,16 +328,21 @@
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-    function calcFit(genes){ return 0; }
-    function _createFunc(arg){
-      return arg ? new ChromoNNet(arg,calcFit) :
-        new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
+    function _createFromScratch(){
+      return GameMode=="trained" ? new ChromoNNet([ NN.NeuralNet.fromJSON(JSON.parse(TRAINED_NNET_STR)) ], calcFit)
+        : new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
           XXactOut: "linear",
           layers:[
             {size:64, XXactFunc: "relu"},
             {size:64, XXactFunc: "relu"}
           ]
         })],calcFit);
+    }
+
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    function calcFit(genes){ return 0; }
+    function _createFunc(arg){
+      return arg ? new ChromoNNet(arg,calcFit) : _createFromScratch();
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -347,6 +358,36 @@
         });
       });
     }
+
+    ////////////////////////////////////////////////////////////////////////////
+    _Z.scene("MainMenu",{
+      setup(){
+        let
+          self=this,
+          K=Mojo.getScaleFactor();
+        _.inject(this.g,{
+          doMenu(){
+            const cfg={fontSize: 32*K, fontName:UI_FONT},
+              gap=_S.bmpText("or", cfg),
+              space=()=> _S.opacity(_S.bmpText("I",cfg),0),
+              b1=_S.uuid(_I.mkBtn(_S.bmpText("Start", cfg)),"play#1"),
+              b2=_S.uuid(_I.mkBtn(_S.bmpText("Start with Trained Data", cfg)),"play#2");
+            b1.m5.press=
+            b2.m5.press=(b)=>{
+              _S.tint(b,C_ORANGE);
+              playClick();
+              _.delay(CLICK_DELAY,()=>{
+                GameMode = (b.m5.uuid == "play#1") ? "normal" : "trained";
+                console.log(`game mode: ==== ${GameMode}`);
+                _Z.replace(self, "PlayGame");
+              });
+            };
+            return self.insert(_Z.layoutY([b1,space(),gap,space(),b2],{bg:"transparent"}))
+          }
+        });
+        this.g.doMenu();
+      }
+    });
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     _Z.scene("PlayGame",{
@@ -418,7 +459,7 @@
       },
       postUpdate(dt){
         this.g.tick(dt);
-        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} /// Score: ${this.g.bestCurScore}`;
+        this.g.genText.text= `Generation: ${this.g.neatObj.curGen()} / Score: ${this.g.bestCurScore}`;
       }
     });
 
@@ -436,6 +477,7 @@
     start(...args){ scenes(...args) }
   });
 
+  console.log(`unmanned version: 107`);
 })(this);
 
 
