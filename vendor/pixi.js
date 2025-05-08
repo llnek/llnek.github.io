@@ -1,6 +1,6 @@
 /*!
- * PixiJS - v8.8.0
- * Compiled Tue, 11 Feb 2025 15:45:29 UTC
+ * PixiJS - v8.9.2
+ * Compiled Tue, 29 Apr 2025 11:37:56 UTC
  *
  * PixiJS is licensed under the MIT License.
  * http://www.opensource.org/licenses/mit-license
@@ -9,21 +9,21 @@ var PIXI = (function (exports) {
     'use strict';
 
     "use strict";
-    var __defProp$1c = Object.defineProperty;
+    var __defProp$1d = Object.defineProperty;
     var __defProps$r = Object.defineProperties;
     var __getOwnPropDescs$r = Object.getOwnPropertyDescriptors;
-    var __getOwnPropSymbols$1c = Object.getOwnPropertySymbols;
-    var __hasOwnProp$1c = Object.prototype.hasOwnProperty;
-    var __propIsEnum$1c = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$1c = (obj, key, value) => key in obj ? __defProp$1c(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$1c = (a, b) => {
+    var __getOwnPropSymbols$1d = Object.getOwnPropertySymbols;
+    var __hasOwnProp$1d = Object.prototype.hasOwnProperty;
+    var __propIsEnum$1d = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$1d = (obj, key, value) => key in obj ? __defProp$1d(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$1d = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$1c.call(b, prop))
-          __defNormalProp$1c(a, prop, b[prop]);
-      if (__getOwnPropSymbols$1c)
-        for (var prop of __getOwnPropSymbols$1c(b)) {
-          if (__propIsEnum$1c.call(b, prop))
-            __defNormalProp$1c(a, prop, b[prop]);
+        if (__hasOwnProp$1d.call(b, prop))
+          __defNormalProp$1d(a, prop, b[prop]);
+      if (__getOwnPropSymbols$1d)
+        for (var prop of __getOwnPropSymbols$1d(b)) {
+          if (__propIsEnum$1d.call(b, prop))
+            __defNormalProp$1d(a, prop, b[prop]);
         }
       return a;
     };
@@ -58,10 +58,10 @@ var PIXI = (function (exports) {
           throw new Error("Extension class must have an extension object");
         }
         const metadata = typeof ext.extension !== "object" ? { type: ext.extension } : ext.extension;
-        ext = __spreadProps$r(__spreadValues$1c({}, metadata), { ref: ext });
+        ext = __spreadProps$r(__spreadValues$1d({}, metadata), { ref: ext });
       }
       if (typeof ext === "object") {
-        ext = __spreadValues$1c({}, ext);
+        ext = __spreadValues$1d({}, ext);
       } else {
         throw new Error("Invalid extension type");
       }
@@ -612,19 +612,19 @@ var PIXI = (function (exports) {
     function namesPlugin(e,f){var a={white:"#ffffff",bisque:"#ffe4c4",blue:"#0000ff",cadetblue:"#5f9ea0",chartreuse:"#7fff00",chocolate:"#d2691e",coral:"#ff7f50",antiquewhite:"#faebd7",aqua:"#00ffff",azure:"#f0ffff",whitesmoke:"#f5f5f5",papayawhip:"#ffefd5",plum:"#dda0dd",blanchedalmond:"#ffebcd",black:"#000000",gold:"#ffd700",goldenrod:"#daa520",gainsboro:"#dcdcdc",cornsilk:"#fff8dc",cornflowerblue:"#6495ed",burlywood:"#deb887",aquamarine:"#7fffd4",beige:"#f5f5dc",crimson:"#dc143c",cyan:"#00ffff",darkblue:"#00008b",darkcyan:"#008b8b",darkgoldenrod:"#b8860b",darkkhaki:"#bdb76b",darkgray:"#a9a9a9",darkgreen:"#006400",darkgrey:"#a9a9a9",peachpuff:"#ffdab9",darkmagenta:"#8b008b",darkred:"#8b0000",darkorchid:"#9932cc",darkorange:"#ff8c00",darkslateblue:"#483d8b",gray:"#808080",darkslategray:"#2f4f4f",darkslategrey:"#2f4f4f",deeppink:"#ff1493",deepskyblue:"#00bfff",wheat:"#f5deb3",firebrick:"#b22222",floralwhite:"#fffaf0",ghostwhite:"#f8f8ff",darkviolet:"#9400d3",magenta:"#ff00ff",green:"#008000",dodgerblue:"#1e90ff",grey:"#808080",honeydew:"#f0fff0",hotpink:"#ff69b4",blueviolet:"#8a2be2",forestgreen:"#228b22",lawngreen:"#7cfc00",indianred:"#cd5c5c",indigo:"#4b0082",fuchsia:"#ff00ff",brown:"#a52a2a",maroon:"#800000",mediumblue:"#0000cd",lightcoral:"#f08080",darkturquoise:"#00ced1",lightcyan:"#e0ffff",ivory:"#fffff0",lightyellow:"#ffffe0",lightsalmon:"#ffa07a",lightseagreen:"#20b2aa",linen:"#faf0e6",mediumaquamarine:"#66cdaa",lemonchiffon:"#fffacd",lime:"#00ff00",khaki:"#f0e68c",mediumseagreen:"#3cb371",limegreen:"#32cd32",mediumspringgreen:"#00fa9a",lightskyblue:"#87cefa",lightblue:"#add8e6",midnightblue:"#191970",lightpink:"#ffb6c1",mistyrose:"#ffe4e1",moccasin:"#ffe4b5",mintcream:"#f5fffa",lightslategray:"#778899",lightslategrey:"#778899",navajowhite:"#ffdead",navy:"#000080",mediumvioletred:"#c71585",powderblue:"#b0e0e6",palegoldenrod:"#eee8aa",oldlace:"#fdf5e6",paleturquoise:"#afeeee",mediumturquoise:"#48d1cc",mediumorchid:"#ba55d3",rebeccapurple:"#663399",lightsteelblue:"#b0c4de",mediumslateblue:"#7b68ee",thistle:"#d8bfd8",tan:"#d2b48c",orchid:"#da70d6",mediumpurple:"#9370db",purple:"#800080",pink:"#ffc0cb",skyblue:"#87ceeb",springgreen:"#00ff7f",palegreen:"#98fb98",red:"#ff0000",yellow:"#ffff00",slateblue:"#6a5acd",lavenderblush:"#fff0f5",peru:"#cd853f",palevioletred:"#db7093",violet:"#ee82ee",teal:"#008080",slategray:"#708090",slategrey:"#708090",aliceblue:"#f0f8ff",darkseagreen:"#8fbc8f",darkolivegreen:"#556b2f",greenyellow:"#adff2f",seagreen:"#2e8b57",seashell:"#fff5ee",tomato:"#ff6347",silver:"#c0c0c0",sienna:"#a0522d",lavender:"#e6e6fa",lightgreen:"#90ee90",orange:"#ffa500",orangered:"#ff4500",steelblue:"#4682b4",royalblue:"#4169e1",turquoise:"#40e0d0",yellowgreen:"#9acd32",salmon:"#fa8072",saddlebrown:"#8b4513",sandybrown:"#f4a460",rosybrown:"#bc8f8f",darksalmon:"#e9967a",lightgoldenrodyellow:"#fafad2",snow:"#fffafa",lightgrey:"#d3d3d3",lightgray:"#d3d3d3",dimgray:"#696969",dimgrey:"#696969",olivedrab:"#6b8e23",olive:"#808000"},r={};for(var d in a)r[a[d]]=d;var l={};e.prototype.toName=function(f){if(!(this.rgba.a||this.rgba.r||this.rgba.g||this.rgba.b))return "transparent";var d,i,n=r[this.toHex()];if(n)return n;if(null==f?void 0:f.closest){var o=this.toRgb(),t=1/0,b="black";if(!l.length)for(var c in a)l[c]=new e(a[c]).toRgb();for(var g in a){var u=(d=o,i=l[g],Math.pow(d.r-i.r,2)+Math.pow(d.g-i.g,2)+Math.pow(d.b-i.b,2));u<t&&(t=u,b=g);}return b}};f.string.push([function(f){var r=f.toLowerCase(),d="transparent"===r?"#0000":a[r];return d?new e(d).toRgb():null},"name"]);}
 
     "use strict";
-    var __defProp$1b = Object.defineProperty;
-    var __getOwnPropSymbols$1b = Object.getOwnPropertySymbols;
-    var __hasOwnProp$1b = Object.prototype.hasOwnProperty;
-    var __propIsEnum$1b = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$1b = (obj, key, value) => key in obj ? __defProp$1b(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$1b = (a, b) => {
+    var __defProp$1c = Object.defineProperty;
+    var __getOwnPropSymbols$1c = Object.getOwnPropertySymbols;
+    var __hasOwnProp$1c = Object.prototype.hasOwnProperty;
+    var __propIsEnum$1c = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$1c = (obj, key, value) => key in obj ? __defProp$1c(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$1c = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$1b.call(b, prop))
-          __defNormalProp$1b(a, prop, b[prop]);
-      if (__getOwnPropSymbols$1b)
-        for (var prop of __getOwnPropSymbols$1b(b)) {
-          if (__propIsEnum$1b.call(b, prop))
-            __defNormalProp$1b(a, prop, b[prop]);
+        if (__hasOwnProp$1c.call(b, prop))
+          __defNormalProp$1c(a, prop, b[prop]);
+      if (__getOwnPropSymbols$1c)
+        for (var prop of __getOwnPropSymbols$1c(b)) {
+          if (__propIsEnum$1c.call(b, prop))
+            __defNormalProp$1c(a, prop, b[prop]);
         }
       return a;
     };
@@ -706,7 +706,7 @@ var PIXI = (function (exports) {
         } else if (Array.isArray(value) || ArrayBuffer.isView(value)) {
           return value.slice(0);
         } else if (typeof value === "object" && value !== null) {
-          return __spreadValues$1b({}, value);
+          return __spreadValues$1c({}, value);
         }
         return value;
       }
@@ -1860,6 +1860,7 @@ Deprecated since v${version}`);
        * @memberof scene.Container#
        */
       removeChildren(beginIndex = 0, endIndex) {
+        var _a;
         const end = endIndex != null ? endIndex : this.children.length;
         const range = end - beginIndex;
         const removed = [];
@@ -1877,7 +1878,9 @@ Deprecated since v${version}`);
             renderGroup.removeChildren(removed);
           }
           for (let i = 0; i < removed.length; ++i) {
-            this.emit("childRemoved", removed[i], this, i);
+            const child = removed[i];
+            (_a = child.parentRenderLayer) == null ? void 0 : _a.detach(child);
+            this.emit("childRemoved", child, this, i);
             removed[i].emit("removed", this);
           }
           if (removed.length > 0) {
@@ -2166,19 +2169,19 @@ Deprecated since v${version}`);
     extensions.handleByList(ExtensionType.MaskEffect, MaskEffectManager._effectClasses);
 
     "use strict";
-    var __defProp$1a = Object.defineProperty;
-    var __getOwnPropSymbols$1a = Object.getOwnPropertySymbols;
-    var __hasOwnProp$1a = Object.prototype.hasOwnProperty;
-    var __propIsEnum$1a = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$1a = (obj, key, value) => key in obj ? __defProp$1a(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$1a = (a, b) => {
+    var __defProp$1b = Object.defineProperty;
+    var __getOwnPropSymbols$1b = Object.getOwnPropertySymbols;
+    var __hasOwnProp$1b = Object.prototype.hasOwnProperty;
+    var __propIsEnum$1b = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$1b = (obj, key, value) => key in obj ? __defProp$1b(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$1b = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$1a.call(b, prop))
-          __defNormalProp$1a(a, prop, b[prop]);
-      if (__getOwnPropSymbols$1a)
-        for (var prop of __getOwnPropSymbols$1a(b)) {
-          if (__propIsEnum$1a.call(b, prop))
-            __defNormalProp$1a(a, prop, b[prop]);
+        if (__hasOwnProp$1b.call(b, prop))
+          __defNormalProp$1b(a, prop, b[prop]);
+      if (__getOwnPropSymbols$1b)
+        for (var prop of __getOwnPropSymbols$1b(b)) {
+          if (__propIsEnum$1b.call(b, prop))
+            __defNormalProp$1b(a, prop, b[prop]);
         }
       return a;
     };
@@ -2262,7 +2265,7 @@ Deprecated since v${version}`);
        * @memberof scene.Container#
        */
       setMask(options) {
-        this._maskOptions = __spreadValues$1a(__spreadValues$1a({}, this._maskOptions), options);
+        this._maskOptions = __spreadValues$1b(__spreadValues$1b({}, this._maskOptions), options);
         if (options.mask) {
           this.mask = options.mask;
         }
@@ -3784,19 +3787,19 @@ Deprecated since v${version}`);
     }
 
     "use strict";
-    var __defProp$19 = Object.defineProperty;
-    var __getOwnPropSymbols$19 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$19 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$19 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$19 = (obj, key, value) => key in obj ? __defProp$19(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$19 = (a, b) => {
+    var __defProp$1a = Object.defineProperty;
+    var __getOwnPropSymbols$1a = Object.getOwnPropertySymbols;
+    var __hasOwnProp$1a = Object.prototype.hasOwnProperty;
+    var __propIsEnum$1a = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$1a = (obj, key, value) => key in obj ? __defProp$1a(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$1a = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$19.call(b, prop))
-          __defNormalProp$19(a, prop, b[prop]);
-      if (__getOwnPropSymbols$19)
-        for (var prop of __getOwnPropSymbols$19(b)) {
-          if (__propIsEnum$19.call(b, prop))
-            __defNormalProp$19(a, prop, b[prop]);
+        if (__hasOwnProp$1a.call(b, prop))
+          __defNormalProp$1a(a, prop, b[prop]);
+      if (__getOwnPropSymbols$1a)
+        for (var prop of __getOwnPropSymbols$1a(b)) {
+          if (__propIsEnum$1a.call(b, prop))
+            __defNormalProp$1a(a, prop, b[prop]);
         }
       return a;
     };
@@ -3831,7 +3834,7 @@ Deprecated since v${version}`);
          * @readonly
          */
         this.destroyed = false;
-        options = __spreadValues$19(__spreadValues$19({}, _TextureStyle.defaultOptions), options);
+        options = __spreadValues$1a(__spreadValues$1a({}, _TextureStyle.defaultOptions), options);
         this.addressMode = options.addressMode;
         this.addressModeU = (_a = options.addressModeU) != null ? _a : this.addressModeU;
         this.addressModeV = (_b = options.addressModeV) != null ? _b : this.addressModeV;
@@ -3909,19 +3912,19 @@ Deprecated since v${version}`);
     let TextureStyle = _TextureStyle;
 
     "use strict";
-    var __defProp$18 = Object.defineProperty;
-    var __getOwnPropSymbols$18 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$18 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$18 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$18 = (obj, key, value) => key in obj ? __defProp$18(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$18 = (a, b) => {
+    var __defProp$19 = Object.defineProperty;
+    var __getOwnPropSymbols$19 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$19 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$19 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$19 = (obj, key, value) => key in obj ? __defProp$19(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$19 = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$18.call(b, prop))
-          __defNormalProp$18(a, prop, b[prop]);
-      if (__getOwnPropSymbols$18)
-        for (var prop of __getOwnPropSymbols$18(b)) {
-          if (__propIsEnum$18.call(b, prop))
-            __defNormalProp$18(a, prop, b[prop]);
+        if (__hasOwnProp$19.call(b, prop))
+          __defNormalProp$19(a, prop, b[prop]);
+      if (__getOwnPropSymbols$19)
+        for (var prop of __getOwnPropSymbols$19(b)) {
+          if (__propIsEnum$19.call(b, prop))
+            __defNormalProp$19(a, prop, b[prop]);
         }
       return a;
     };
@@ -4014,7 +4017,7 @@ Deprecated since v${version}`);
          * @protected
          */
         this._textureBindLocation = -1;
-        options = __spreadValues$18(__spreadValues$18({}, _TextureSource.defaultOptions), options);
+        options = __spreadValues$19(__spreadValues$19({}, _TextureSource.defaultOptions), options);
         this.label = (_a = options.label) != null ? _a : "";
         this.resource = options.resource;
         this.autoGarbageCollect = options.autoGarbageCollect;
@@ -4513,21 +4516,21 @@ Deprecated since v${version}`);
     };
 
     "use strict";
-    var __defProp$17 = Object.defineProperty;
+    var __defProp$18 = Object.defineProperty;
     var __defProps$q = Object.defineProperties;
     var __getOwnPropDescs$q = Object.getOwnPropertyDescriptors;
-    var __getOwnPropSymbols$17 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$17 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$17 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$17 = (obj, key, value) => key in obj ? __defProp$17(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$17 = (a, b) => {
+    var __getOwnPropSymbols$18 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$18 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$18 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$18 = (obj, key, value) => key in obj ? __defProp$18(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$18 = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$17.call(b, prop))
-          __defNormalProp$17(a, prop, b[prop]);
-      if (__getOwnPropSymbols$17)
-        for (var prop of __getOwnPropSymbols$17(b)) {
-          if (__propIsEnum$17.call(b, prop))
-            __defNormalProp$17(a, prop, b[prop]);
+        if (__hasOwnProp$18.call(b, prop))
+          __defNormalProp$18(a, prop, b[prop]);
+      if (__getOwnPropSymbols$18)
+        for (var prop of __getOwnPropSymbols$18(b)) {
+          if (__propIsEnum$18.call(b, prop))
+            __defNormalProp$18(a, prop, b[prop]);
         }
       return a;
     };
@@ -4553,7 +4556,7 @@ Deprecated since v${version}`);
             format = "bgra8unorm";
           }
         }
-        super(__spreadProps$q(__spreadValues$17({}, options), {
+        super(__spreadProps$q(__spreadValues$18({}, options), {
           resource: buffer,
           format
         }));
@@ -4842,21 +4845,21 @@ Deprecated since v${version}`);
     Texture.WHITE.destroy = NOOP;
 
     "use strict";
-    var __defProp$16 = Object.defineProperty;
+    var __defProp$17 = Object.defineProperty;
     var __defProps$p = Object.defineProperties;
     var __getOwnPropDescs$p = Object.getOwnPropertyDescriptors;
-    var __getOwnPropSymbols$16 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$16 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$16 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$16 = (obj, key, value) => key in obj ? __defProp$16(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$16 = (a, b) => {
+    var __getOwnPropSymbols$17 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$17 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$17 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$17 = (obj, key, value) => key in obj ? __defProp$17(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$17 = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$16.call(b, prop))
-          __defNormalProp$16(a, prop, b[prop]);
-      if (__getOwnPropSymbols$16)
-        for (var prop of __getOwnPropSymbols$16(b)) {
-          if (__propIsEnum$16.call(b, prop))
-            __defNormalProp$16(a, prop, b[prop]);
+        if (__hasOwnProp$17.call(b, prop))
+          __defNormalProp$17(a, prop, b[prop]);
+      if (__getOwnPropSymbols$17)
+        for (var prop of __getOwnPropSymbols$17(b)) {
+          if (__propIsEnum$17.call(b, prop))
+            __defNormalProp$17(a, prop, b[prop]);
         }
       return a;
     };
@@ -4880,7 +4883,7 @@ Deprecated since v${version}`);
        * @param antialias
        */
       createTexture(pixelWidth, pixelHeight, antialias) {
-        const textureSource = new TextureSource(__spreadProps$p(__spreadValues$16({}, this.textureOptions), {
+        const textureSource = new TextureSource(__spreadProps$p(__spreadValues$17({}, this.textureOptions), {
           width: pixelWidth,
           height: pixelHeight,
           resolution: 1,
@@ -6261,19 +6264,19 @@ Deprecated since v${version}`);
     const isMobile = isMobileCall(globalThis.navigator);
 
     "use strict";
-    var __defProp$15 = Object.defineProperty;
-    var __getOwnPropSymbols$15 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$15 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$15 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$15 = (obj, key, value) => key in obj ? __defProp$15(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$15 = (a, b) => {
+    var __defProp$16 = Object.defineProperty;
+    var __getOwnPropSymbols$16 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$16 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$16 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$16 = (obj, key, value) => key in obj ? __defProp$16(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$16 = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$15.call(b, prop))
-          __defNormalProp$15(a, prop, b[prop]);
-      if (__getOwnPropSymbols$15)
-        for (var prop of __getOwnPropSymbols$15(b)) {
-          if (__propIsEnum$15.call(b, prop))
-            __defNormalProp$15(a, prop, b[prop]);
+        if (__hasOwnProp$16.call(b, prop))
+          __defNormalProp$16(a, prop, b[prop]);
+      if (__getOwnPropSymbols$16)
+        for (var prop of __getOwnPropSymbols$16(b)) {
+          if (__propIsEnum$16.call(b, prop))
+            __defNormalProp$16(a, prop, b[prop]);
         }
       return a;
     };
@@ -6485,7 +6488,7 @@ Deprecated since v${version}`);
       init(options) {
         const defaultOpts = _AccessibilitySystem.defaultOptions;
         const mergedOptions = {
-          accessibilityOptions: __spreadValues$15(__spreadValues$15({}, defaultOpts), (options == null ? void 0 : options.accessibilityOptions) || {})
+          accessibilityOptions: __spreadValues$16(__spreadValues$16({}, defaultOpts), (options == null ? void 0 : options.accessibilityOptions) || {})
         };
         this.debug = mergedOptions.accessibilityOptions.debug;
         this._activateOnTab = mergedOptions.accessibilityOptions.activateOnTab;
@@ -8731,19 +8734,19 @@ Deprecated since v${version}`);
     }
 
     "use strict";
-    var __defProp$14 = Object.defineProperty;
-    var __getOwnPropSymbols$14 = Object.getOwnPropertySymbols;
-    var __hasOwnProp$14 = Object.prototype.hasOwnProperty;
-    var __propIsEnum$14 = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$14 = (obj, key, value) => key in obj ? __defProp$14(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$14 = (a, b) => {
+    var __defProp$15 = Object.defineProperty;
+    var __getOwnPropSymbols$15 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$15 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$15 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$15 = (obj, key, value) => key in obj ? __defProp$15(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$15 = (a, b) => {
       for (var prop in b || (b = {}))
-        if (__hasOwnProp$14.call(b, prop))
-          __defNormalProp$14(a, prop, b[prop]);
-      if (__getOwnPropSymbols$14)
-        for (var prop of __getOwnPropSymbols$14(b)) {
-          if (__propIsEnum$14.call(b, prop))
-            __defNormalProp$14(a, prop, b[prop]);
+        if (__hasOwnProp$15.call(b, prop))
+          __defNormalProp$15(a, prop, b[prop]);
+      if (__getOwnPropSymbols$15)
+        for (var prop of __getOwnPropSymbols$15(b)) {
+          if (__propIsEnum$15.call(b, prop))
+            __defNormalProp$15(a, prop, b[prop]);
         }
       return a;
     };
@@ -8782,7 +8785,7 @@ Deprecated since v${version}`);
           default: "inherit",
           pointer: "pointer"
         };
-        this.features = new Proxy(__spreadValues$14({}, _EventSystem.defaultEventFeatures), {
+        this.features = new Proxy(__spreadValues$15({}, _EventSystem.defaultEventFeatures), {
           set: (target, key, value) => {
             if (key === "globalMove") {
               this.rootBoundary.enableGlobalMoveEvents = value;
@@ -9763,6 +9766,309 @@ Deprecated since v${version}`);
     "use strict";
     extensions.add(EventSystem);
     extensions.mixin(Container, FederatedContainer);
+
+    "use strict";
+    class DOMPipe {
+      /**
+       * Constructor for the DOMPipe class.
+       * @param renderer - The renderer instance that this DOMPipe will be associated with.
+       */
+      constructor(renderer) {
+        this._destroyRenderableBound = this.destroyRenderable.bind(this);
+        /** Array to keep track of attached DOM elements */
+        this._attachedDomElements = [];
+        this._renderer = renderer;
+        this._renderer.runners.postrender.add(this);
+        this._domElement = document.createElement("div");
+        this._domElement.style.position = "absolute";
+        this._domElement.style.top = "0";
+        this._domElement.style.left = "0";
+        this._domElement.style.pointerEvents = "none";
+        this._domElement.style.zIndex = "1000";
+      }
+      /**
+       * Adds a renderable DOM container to the list of attached elements.
+       * @param domContainer - The DOM container to be added.
+       * @param _instructionSet - The instruction set (unused).
+       */
+      addRenderable(domContainer, _instructionSet) {
+        if (!this._attachedDomElements.includes(domContainer)) {
+          this._attachedDomElements.push(domContainer);
+          domContainer.on("destroyed", this._destroyRenderableBound);
+        }
+      }
+      /**
+       * Updates a renderable DOM container.
+       * @param _domContainer - The DOM container to be updated (unused).
+       */
+      updateRenderable(_domContainer) {
+      }
+      /**
+       * Validates a renderable DOM container.
+       * @param _domContainer - The DOM container to be validated (unused).
+       * @returns Always returns true as validation is not required.
+       */
+      validateRenderable(_domContainer) {
+        return true;
+      }
+      /**
+       * Destroys a renderable DOM container, removing it from the list of attached elements.
+       * @param domContainer - The DOM container to be destroyed.
+       */
+      destroyRenderable(domContainer) {
+        const index = this._attachedDomElements.indexOf(domContainer);
+        if (index !== -1) {
+          this._attachedDomElements.splice(index, 1);
+        }
+        domContainer.off("destroyed", this._destroyRenderableBound);
+      }
+      /** Handles the post-rendering process, ensuring DOM elements are correctly positioned and visible. */
+      postrender() {
+        var _a;
+        const attachedDomElements = this._attachedDomElements;
+        if (attachedDomElements.length === 0) {
+          this._domElement.remove();
+          return;
+        }
+        const canvas = this._renderer.view.canvas;
+        if (this._domElement.parentNode !== canvas.parentNode) {
+          (_a = canvas.parentNode) == null ? void 0 : _a.appendChild(this._domElement);
+        }
+        this._domElement.style.transform = `translate(${canvas.offsetLeft}px, ${canvas.offsetTop}px)`;
+        for (let i = 0; i < attachedDomElements.length; i++) {
+          const domContainer = attachedDomElements[i];
+          const element = domContainer.element;
+          if (!domContainer.parent || domContainer.globalDisplayStatus < 7) {
+            element.remove();
+            attachedDomElements.splice(i, 1);
+            i--;
+          } else {
+            if (!this._domElement.contains(element)) {
+              element.style.position = "absolute";
+              element.style.pointerEvents = "auto";
+              this._domElement.appendChild(element);
+            }
+            const wt = domContainer.worldTransform;
+            const anchor = domContainer._anchor;
+            const ax = domContainer.width * anchor.x;
+            const ay = domContainer.height * anchor.y;
+            element.style.transformOrigin = `${ax}px ${ay}px`;
+            element.style.transform = `matrix(${wt.a}, ${wt.b}, ${wt.c}, ${wt.d}, ${wt.tx - ax}, ${wt.ty - ay})`;
+            element.style.opacity = domContainer.groupAlpha.toString();
+          }
+        }
+      }
+      /** Destroys the DOMPipe, removing all attached DOM elements and cleaning up resources. */
+      destroy() {
+        this._renderer.runners.postrender.remove(this);
+        for (let i = 0; i < this._attachedDomElements.length; i++) {
+          const domContainer = this._attachedDomElements[i];
+          domContainer.off("destroyed", this._destroyRenderableBound);
+          domContainer.element.remove();
+        }
+        this._attachedDomElements.length = 0;
+        this._domElement.remove();
+        this._renderer = null;
+      }
+    }
+    /**
+     * Static property defining the extension type and name for the DOMPipe.
+     * This is used to register the DOMPipe with different rendering pipelines.
+     */
+    DOMPipe.extension = {
+      type: [
+        ExtensionType.WebGLPipes,
+        ExtensionType.WebGPUPipes,
+        ExtensionType.CanvasPipes
+      ],
+      name: "dom"
+    };
+
+    "use strict";
+    class ViewContainer extends Container {
+      // eslint-disable-next-line @typescript-eslint/no-useless-constructor
+      constructor(options) {
+        super(options);
+        /** @private */
+        this.canBundle = true;
+        /** @private */
+        this.allowChildren = false;
+        /** @private */
+        this._roundPixels = 0;
+        /** @private */
+        this._lastUsed = -1;
+        this._bounds = new Bounds(0, 1, 0, 0);
+        this._boundsDirty = true;
+      }
+      /**
+       * The local bounds of the view.
+       * @type {rendering.Bounds}
+       */
+      get bounds() {
+        if (!this._boundsDirty)
+          return this._bounds;
+        this.updateBounds();
+        this._boundsDirty = false;
+        return this._bounds;
+      }
+      /**
+       * Whether or not to round the x/y position of the sprite.
+       * @type {boolean}
+       */
+      get roundPixels() {
+        return !!this._roundPixels;
+      }
+      set roundPixels(value) {
+        this._roundPixels = value ? 1 : 0;
+      }
+      /**
+       * Checks if the object contains the given point.
+       * @param point - The point to check
+       */
+      containsPoint(point) {
+        const bounds = this.bounds;
+        const { x, y } = point;
+        return x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY;
+      }
+      /** @private */
+      onViewUpdate() {
+        this._didViewChangeTick++;
+        this._boundsDirty = true;
+        if (this.didViewUpdate)
+          return;
+        this.didViewUpdate = true;
+        const renderGroup = this.renderGroup || this.parentRenderGroup;
+        if (renderGroup) {
+          renderGroup.onChildViewUpdate(this);
+        }
+      }
+      destroy(options) {
+        super.destroy(options);
+        this._bounds = null;
+      }
+      collectRenderablesSimple(instructionSet, renderer, currentLayer) {
+        const { renderPipes, renderableGC } = renderer;
+        renderPipes.blendMode.setBlendMode(this, this.groupBlendMode, instructionSet);
+        const rp = renderPipes;
+        rp[this.renderPipeId].addRenderable(this, instructionSet);
+        renderableGC.addRenderable(this);
+        this.didViewUpdate = false;
+        const children = this.children;
+        const length = children.length;
+        for (let i = 0; i < length; i++) {
+          children[i].collectRenderables(instructionSet, renderer, currentLayer);
+        }
+      }
+    }
+
+    "use strict";
+    var __defProp$14 = Object.defineProperty;
+    var __getOwnPropSymbols$14 = Object.getOwnPropertySymbols;
+    var __hasOwnProp$14 = Object.prototype.hasOwnProperty;
+    var __propIsEnum$14 = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$14 = (obj, key, value) => key in obj ? __defProp$14(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$14 = (a, b) => {
+      for (var prop in b || (b = {}))
+        if (__hasOwnProp$14.call(b, prop))
+          __defNormalProp$14(a, prop, b[prop]);
+      if (__getOwnPropSymbols$14)
+        for (var prop of __getOwnPropSymbols$14(b)) {
+          if (__propIsEnum$14.call(b, prop))
+            __defNormalProp$14(a, prop, b[prop]);
+        }
+      return a;
+    };
+    var __objRest$m = (source, exclude) => {
+      var target = {};
+      for (var prop in source)
+        if (__hasOwnProp$14.call(source, prop) && exclude.indexOf(prop) < 0)
+          target[prop] = source[prop];
+      if (source != null && __getOwnPropSymbols$14)
+        for (var prop of __getOwnPropSymbols$14(source)) {
+          if (exclude.indexOf(prop) < 0 && __propIsEnum$14.call(source, prop))
+            target[prop] = source[prop];
+        }
+      return target;
+    };
+    class DOMContainer extends ViewContainer {
+      /**
+       * @param options - The options for creating the DOM container.
+       */
+      constructor(options = {}) {
+        const _a = options, { element, anchor } = _a, rest = __objRest$m(_a, ["element", "anchor"]);
+        super(__spreadValues$14({
+          label: "DOMContainer"
+        }, rest));
+        /** @private */
+        this.renderPipeId = "dom";
+        /** @private */
+        this.batched = false;
+        this._anchor = new Point(0, 0);
+        if (anchor) {
+          this.anchor = anchor;
+        }
+        this.element = options.element || document.createElement("div");
+      }
+      /**
+       * The anchor sets the origin point of the container.
+       * The default is `(0,0)`, this means the container's origin is the top left.
+       *
+       * Setting the anchor to `(0.5,0.5)` means the container's origin is centered.
+       * Setting the anchor to `(1,1)` would mean the container's origin point will be the bottom right corner.
+       *
+       * If you pass only single parameter, it will set both x and y to the same value as shown in the example below.
+       */
+      get anchor() {
+        return this._anchor;
+      }
+      set anchor(value) {
+        typeof value === "number" ? this._anchor.set(value) : this._anchor.copyFrom(value);
+      }
+      set element(value) {
+        if (this._element === value)
+          return;
+        this._element = value;
+        this.onViewUpdate();
+      }
+      /** The DOM element that this container is using. */
+      get element() {
+        return this._element;
+      }
+      /** @private */
+      updateBounds() {
+        const bounds = this._bounds;
+        const element = this._element;
+        if (!element) {
+          bounds.minX = 0;
+          bounds.minY = 0;
+          bounds.maxX = 0;
+          bounds.maxY = 0;
+          return;
+        }
+        const { offsetWidth, offsetHeight } = element;
+        bounds.minX = 0;
+        bounds.maxX = offsetWidth;
+        bounds.minY = 0;
+        bounds.maxY = offsetHeight;
+      }
+      /**
+       * Destroys this DOM container.
+       * @param options - Options parameter. A boolean will act as if all options
+       *  have been set to that value
+       */
+      destroy(options = false) {
+        var _a, _b;
+        super.destroy(options);
+        (_b = (_a = this._element) == null ? void 0 : _a.parentNode) == null ? void 0 : _b.removeChild(this._element);
+        this._element = null;
+        this._anchor = null;
+      }
+    }
+
+    "use strict";
+
+    "use strict";
+    extensions.add(DOMPipe);
 
     "use strict";
     var LoaderParserPriority = /* @__PURE__ */ ((LoaderParserPriority2) => {
@@ -11194,83 +11500,6 @@ Deprecated since v${version}`);
     }
 
     "use strict";
-    class ViewContainer extends Container {
-      // eslint-disable-next-line @typescript-eslint/no-useless-constructor
-      constructor(options) {
-        super(options);
-        /** @private */
-        this.canBundle = true;
-        /** @private */
-        this.allowChildren = false;
-        /** @private */
-        this._roundPixels = 0;
-        /** @private */
-        this._lastUsed = -1;
-        this._bounds = new Bounds(0, 1, 0, 0);
-        this._boundsDirty = true;
-      }
-      /**
-       * The local bounds of the view.
-       * @type {rendering.Bounds}
-       */
-      get bounds() {
-        if (!this._boundsDirty)
-          return this._bounds;
-        this.updateBounds();
-        this._boundsDirty = false;
-        return this._bounds;
-      }
-      /**
-       * Whether or not to round the x/y position of the sprite.
-       * @type {boolean}
-       */
-      get roundPixels() {
-        return !!this._roundPixels;
-      }
-      set roundPixels(value) {
-        this._roundPixels = value ? 1 : 0;
-      }
-      /**
-       * Checks if the object contains the given point.
-       * @param point - The point to check
-       */
-      containsPoint(point) {
-        const bounds = this.bounds;
-        const { x, y } = point;
-        return x >= bounds.minX && x <= bounds.maxX && y >= bounds.minY && y <= bounds.maxY;
-      }
-      /** @private */
-      onViewUpdate() {
-        this._didViewChangeTick++;
-        this._boundsDirty = true;
-        if (this.didViewUpdate)
-          return;
-        this.didViewUpdate = true;
-        const renderGroup = this.renderGroup || this.parentRenderGroup;
-        if (renderGroup) {
-          renderGroup.onChildViewUpdate(this);
-        }
-      }
-      destroy(options) {
-        super.destroy(options);
-        this._bounds = null;
-      }
-      collectRenderablesSimple(instructionSet, renderer, currentLayer) {
-        const { renderPipes, renderableGC } = renderer;
-        renderPipes.blendMode.setBlendMode(this, this.groupBlendMode, instructionSet);
-        const rp = renderPipes;
-        rp[this.renderPipeId].addRenderable(this, instructionSet);
-        renderableGC.addRenderable(this);
-        this.didViewUpdate = false;
-        const children = this.children;
-        const length = children.length;
-        for (let i = 0; i < length; i++) {
-          children[i].collectRenderables(instructionSet, renderer, currentLayer);
-        }
-      }
-    }
-
-    "use strict";
     var __defProp$12 = Object.defineProperty;
     var __getOwnPropSymbols$12 = Object.getOwnPropertySymbols;
     var __hasOwnProp$12 = Object.prototype.hasOwnProperty;
@@ -11644,7 +11873,7 @@ Deprecated since v${version}`);
         this.transparent = !!options.transparent;
       }
       resizeCanvas() {
-        if (this.autoDensity) {
+        if (this.autoDensity && "style" in this.resource) {
           this.resource.style.width = `${this.width}px`;
           this.resource.style.height = `${this.height}px`;
         }
@@ -16445,22 +16674,285 @@ ${parts.join("\n")}
     };
 
     "use strict";
+    var __defProp$W = Object.defineProperty;
+    var __getOwnPropSymbols$W = Object.getOwnPropertySymbols;
+    var __hasOwnProp$W = Object.prototype.hasOwnProperty;
+    var __propIsEnum$W = Object.prototype.propertyIsEnumerable;
+    var __defNormalProp$W = (obj, key, value) => key in obj ? __defProp$W(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+    var __spreadValues$W = (a, b) => {
+      for (var prop in b || (b = {}))
+        if (__hasOwnProp$W.call(b, prop))
+          __defNormalProp$W(a, prop, b[prop]);
+      if (__getOwnPropSymbols$W)
+        for (var prop of __getOwnPropSymbols$W(b)) {
+          if (__propIsEnum$W.call(b, prop))
+            __defNormalProp$W(a, prop, b[prop]);
+        }
+      return a;
+    };
+    const emptyColorStops = [{ offset: 0, color: "white" }, { offset: 1, color: "black" }];
+    const _FillGradient = class _FillGradient {
+      constructor(...args) {
+        /** Unique identifier for this gradient instance */
+        this.uid = uid$1("fillGradient");
+        /** Type of gradient - currently only supports 'linear' */
+        this.type = "linear";
+        /** Array of color stops defining the gradient */
+        this.colorStops = [];
+        var _a;
+        let options = ensureGradientOptions(args);
+        const defaults = options.type === "radial" ? _FillGradient.defaultRadialOptions : _FillGradient.defaultLinearOptions;
+        options = __spreadValues$W(__spreadValues$W({}, defaults), definedProps(options));
+        this._textureSize = options.textureSize;
+        this._wrapMode = options.wrapMode;
+        if (options.type === "radial") {
+          this.center = options.center;
+          this.outerCenter = (_a = options.outerCenter) != null ? _a : this.center;
+          this.innerRadius = options.innerRadius;
+          this.outerRadius = options.outerRadius;
+          this.scale = options.scale;
+          this.rotation = options.rotation;
+        } else {
+          this.start = options.start;
+          this.end = options.end;
+        }
+        this.textureSpace = options.textureSpace;
+        this.type = options.type;
+        options.colorStops.forEach((stop) => {
+          this.addColorStop(stop.offset, stop.color);
+        });
+      }
+      /**
+       * Adds a color stop to the gradient
+       * @param offset - Position of the stop (0-1)
+       * @param color - Color of the stop
+       * @returns This gradient instance for chaining
+       */
+      addColorStop(offset, color) {
+        this.colorStops.push({ offset, color: Color.shared.setValue(color).toHexa() });
+        return this;
+      }
+      /**
+       * Builds the internal texture and transform for the gradient.
+       * Called automatically when the gradient is first used.
+       * @internal
+       */
+      buildLinearGradient() {
+        if (this.texture)
+          return;
+        let { x: x0, y: y0 } = this.start;
+        let { x: x1, y: y1 } = this.end;
+        let dx = x1 - x0;
+        let dy = y1 - y0;
+        const flip = dx < 0 || dy < 0;
+        if (this._wrapMode === "clamp-to-edge") {
+          if (dx < 0) {
+            const temp = x0;
+            x0 = x1;
+            x1 = temp;
+            dx *= -1;
+          }
+          if (dy < 0) {
+            const temp = y0;
+            y0 = y1;
+            y1 = temp;
+            dy *= -1;
+          }
+        }
+        const colorStops = this.colorStops.length ? this.colorStops : emptyColorStops;
+        const defaultSize = this._textureSize;
+        const { canvas, context } = getCanvas(defaultSize, 1);
+        const gradient = !flip ? context.createLinearGradient(0, 0, this._textureSize, 0) : context.createLinearGradient(this._textureSize, 0, 0, 0);
+        addColorStops(gradient, colorStops);
+        context.fillStyle = gradient;
+        context.fillRect(0, 0, defaultSize, 1);
+        this.texture = new Texture({
+          source: new ImageSource({
+            resource: canvas,
+            addressMode: this._wrapMode
+          })
+        });
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        const angle = Math.atan2(dy, dx);
+        const m = new Matrix();
+        m.scale(dist / defaultSize, 1);
+        m.rotate(angle);
+        m.translate(x0, y0);
+        if (this.textureSpace === "local") {
+          m.scale(defaultSize, defaultSize);
+        }
+        this.transform = m;
+      }
+      buildGradient() {
+        if (this.type === "linear") {
+          this.buildLinearGradient();
+        } else {
+          this.buildRadialGradient();
+        }
+      }
+      buildRadialGradient() {
+        if (this.texture)
+          return;
+        const colorStops = this.colorStops.length ? this.colorStops : emptyColorStops;
+        const defaultSize = this._textureSize;
+        const { canvas, context } = getCanvas(defaultSize, defaultSize);
+        const { x: x0, y: y0 } = this.center;
+        const { x: x1, y: y1 } = this.outerCenter;
+        const r0 = this.innerRadius;
+        const r1 = this.outerRadius;
+        const ox = x1 - r1;
+        const oy = y1 - r1;
+        const scale = defaultSize / (r1 * 2);
+        const cx = (x0 - ox) * scale;
+        const cy = (y0 - oy) * scale;
+        const gradient = context.createRadialGradient(
+          cx,
+          cy,
+          r0 * scale,
+          (x1 - ox) * scale,
+          (y1 - oy) * scale,
+          r1 * scale
+        );
+        addColorStops(gradient, colorStops);
+        context.fillStyle = colorStops[colorStops.length - 1].color;
+        context.fillRect(0, 0, defaultSize, defaultSize);
+        context.fillStyle = gradient;
+        context.translate(cx, cy);
+        context.rotate(this.rotation);
+        context.scale(1, this.scale);
+        context.translate(-cx, -cy);
+        context.fillRect(0, 0, defaultSize, defaultSize);
+        this.texture = new Texture({
+          source: new ImageSource({
+            resource: canvas,
+            addressMode: this._wrapMode
+          })
+        });
+        const m = new Matrix();
+        m.scale(1 / scale, 1 / scale);
+        m.translate(ox, oy);
+        if (this.textureSpace === "local") {
+          m.scale(defaultSize, defaultSize);
+        }
+        this.transform = m;
+      }
+      /**
+       * Gets a unique key representing the current state of the gradient.
+       * Used internally for caching.
+       * @returns Unique string key
+       */
+      get styleKey() {
+        return this.uid;
+      }
+      destroy() {
+        var _a;
+        (_a = this.texture) == null ? void 0 : _a.destroy(true);
+        this.texture = null;
+      }
+    };
+    /**
+     * Default options for creating a gradient fill
+     * @property {PointData} start - Start point of the gradient (default: { x: 0, y: 0 })
+     * @property {PointData} end - End point of the gradient (default: { x: 0, y: 1 })
+     * @property {TextureSpace} textureSpace - Whether coordinates are 'global' or 'local' (default: 'local')
+     * @property {number} textureSize - The size of the texture to use for the gradient (default: 256)
+     * @property {Array<{offset: number, color: ColorSource}>} colorStops - Array of color stops (default: empty array)
+     * @property {GradientType} type - Type of gradient (default: 'linear')
+     * @property {WRAP_MODE} wrapMode - The wrap mode of the gradient (default: 'clamp-to-edge')
+     */
+    _FillGradient.defaultLinearOptions = {
+      start: { x: 0, y: 0 },
+      end: { x: 0, y: 1 },
+      colorStops: [],
+      textureSpace: "local",
+      type: "linear",
+      textureSize: 256,
+      wrapMode: "clamp-to-edge"
+    };
+    /**
+     * Default options for creating a radial gradient fill
+     * @property {PointData} innerCenter - Center of the inner circle (default: { x: 0.5, y: 0.5 })
+     * @property {number} innerRadius - Radius of the inner circle (default: 0)
+     * @property {PointData} outerCenter - Center of the outer circle (default: { x: 0.5, y: 0.5 })
+     * @property {number} outerRadius - Radius of the outer circle (default: 0.5)
+     * @property {TextureSpace} textureSpace - Whether coordinates are 'global' or 'local' (default: 'local')
+     * @property {number} textureSize - The size of the texture to use for the gradient (default: 256)
+     * @property {Array<{offset: number, color: ColorSource}>} colorStops - Array of color stops (default: empty array)
+     * @property {GradientType} type - Type of gradient (default: 'radial')
+     * @property {WRAP_MODE} wrapMode - The wrap mode of the gradient (default: 'clamp-to-edge')
+     */
+    _FillGradient.defaultRadialOptions = {
+      center: { x: 0.5, y: 0.5 },
+      innerRadius: 0,
+      outerRadius: 0.5,
+      colorStops: [],
+      scale: 1,
+      textureSpace: "local",
+      type: "radial",
+      textureSize: 256,
+      wrapMode: "clamp-to-edge"
+    };
+    let FillGradient = _FillGradient;
+    function addColorStops(gradient, colorStops) {
+      for (let i = 0; i < colorStops.length; i++) {
+        const stop = colorStops[i];
+        gradient.addColorStop(stop.offset, stop.color);
+      }
+    }
+    function getCanvas(width, height) {
+      const canvas = DOMAdapter.get().createCanvas(width, height);
+      const context = canvas.getContext("2d");
+      return { canvas, context };
+    }
+    function ensureGradientOptions(args) {
+      var _a, _b;
+      let options = (_a = args[0]) != null ? _a : {};
+      if (typeof options === "number" || args[1]) {
+        deprecation("8.5.2", `use options object instead`);
+        options = {
+          type: "linear",
+          start: { x: args[0], y: args[1] },
+          end: { x: args[2], y: args[3] },
+          textureSpace: args[4],
+          textureSize: (_b = args[5]) != null ? _b : FillGradient.defaultLinearOptions.textureSize
+        };
+      }
+      return options;
+    }
+
+    "use strict";
     const tempTextureMatrix$1 = new Matrix();
     const tempRect$3 = new Rectangle();
     function generateTextureMatrix(out, style, shape, matrix) {
       const textureMatrix = style.matrix ? out.copyFrom(style.matrix).invert() : out.identity();
       if (style.textureSpace === "local") {
         const bounds = shape.getBounds(tempRect$3);
-        textureMatrix.translate(-bounds.x, -bounds.y);
-        textureMatrix.scale(1 / bounds.width, 1 / bounds.height);
+        if (style.width) {
+          bounds.pad(style.width);
+        }
+        const { x: tx, y: ty } = bounds;
+        const sx = 1 / bounds.width;
+        const sy = 1 / bounds.height;
+        const mTx = -tx * sx;
+        const mTy = -ty * sy;
+        const a1 = textureMatrix.a;
+        const b1 = textureMatrix.b;
+        const c1 = textureMatrix.c;
+        const d1 = textureMatrix.d;
+        textureMatrix.a *= sx;
+        textureMatrix.b *= sx;
+        textureMatrix.c *= sy;
+        textureMatrix.d *= sy;
+        textureMatrix.tx = mTx * a1 + mTy * c1 + textureMatrix.tx;
+        textureMatrix.ty = mTx * b1 + mTy * d1 + textureMatrix.ty;
       } else {
         textureMatrix.translate(style.texture.frame.x, style.texture.frame.y);
         textureMatrix.scale(1 / style.texture.source.width, 1 / style.texture.source.height);
-        const sourceStyle = style.texture.source.style;
-        if (sourceStyle.addressMode === "clamp-to-edge") {
-          sourceStyle.addressMode = "repeat";
-          sourceStyle.update();
-        }
+      }
+      const sourceStyle = style.texture.source.style;
+      if (!(style.fill instanceof FillGradient) && sourceStyle.addressMode === "clamp-to-edge") {
+        sourceStyle.addressMode = "repeat";
+        sourceStyle.update();
       }
       if (matrix) {
         textureMatrix.append(tempTextureMatrix$1.copyFrom(matrix).invert());
@@ -17928,233 +18420,6 @@ ${parts.join("\n")}
       ++right;
       ++bottom;
       return new Rectangle(left / resolution, top / resolution, (right - left) / resolution, (bottom - top) / resolution);
-    }
-
-    "use strict";
-    var __defProp$W = Object.defineProperty;
-    var __getOwnPropSymbols$W = Object.getOwnPropertySymbols;
-    var __hasOwnProp$W = Object.prototype.hasOwnProperty;
-    var __propIsEnum$W = Object.prototype.propertyIsEnumerable;
-    var __defNormalProp$W = (obj, key, value) => key in obj ? __defProp$W(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
-    var __spreadValues$W = (a, b) => {
-      for (var prop in b || (b = {}))
-        if (__hasOwnProp$W.call(b, prop))
-          __defNormalProp$W(a, prop, b[prop]);
-      if (__getOwnPropSymbols$W)
-        for (var prop of __getOwnPropSymbols$W(b)) {
-          if (__propIsEnum$W.call(b, prop))
-            __defNormalProp$W(a, prop, b[prop]);
-        }
-      return a;
-    };
-    const emptyColorStops = [{ offset: 0, color: "white" }, { offset: 1, color: "black" }];
-    const _FillGradient = class _FillGradient {
-      constructor(...args) {
-        /** Unique identifier for this gradient instance */
-        this.uid = uid$1("fillGradient");
-        /** Type of gradient - currently only supports 'linear' */
-        this.type = "linear";
-        /** Array of color stops defining the gradient */
-        this.colorStops = [];
-        var _a;
-        let options = ensureGradientOptions(args);
-        const defaults = options.type === "radial" ? _FillGradient.defaultRadialOptions : _FillGradient.defaultLinearOptions;
-        options = __spreadValues$W(__spreadValues$W({}, defaults), definedProps(options));
-        this._textureSize = options.textureSize;
-        if (options.type === "radial") {
-          this.center = options.center;
-          this.outerCenter = (_a = options.outerCenter) != null ? _a : this.center;
-          this.innerRadius = options.innerRadius;
-          this.outerRadius = options.outerRadius;
-          this.scale = options.scale;
-          this.rotation = options.rotation;
-        } else {
-          this.start = options.start;
-          this.end = options.end;
-        }
-        this.textureSpace = options.textureSpace;
-        this.type = options.type;
-        options.colorStops.forEach((stop) => {
-          this.addColorStop(stop.offset, stop.color);
-        });
-      }
-      /**
-       * Adds a color stop to the gradient
-       * @param offset - Position of the stop (0-1)
-       * @param color - Color of the stop
-       * @returns This gradient instance for chaining
-       */
-      addColorStop(offset, color) {
-        this.colorStops.push({ offset, color: Color.shared.setValue(color).toHexa() });
-        return this;
-      }
-      /**
-       * Builds the internal texture and transform for the gradient.
-       * Called automatically when the gradient is first used.
-       * @internal
-       */
-      buildLinearGradient() {
-        if (this.texture)
-          return;
-        const colorStops = this.colorStops.length ? this.colorStops : emptyColorStops;
-        const defaultSize = this._textureSize;
-        const { canvas, context } = getCanvas(defaultSize, 1);
-        const gradient = context.createLinearGradient(0, 0, this._textureSize, 0);
-        addColorStops(gradient, colorStops);
-        context.fillStyle = gradient;
-        context.fillRect(0, 0, defaultSize, 1);
-        this.texture = new Texture({
-          source: new ImageSource({
-            resource: canvas
-          })
-        });
-        const { x: x0, y: y0 } = this.start;
-        const { x: x1, y: y1 } = this.end;
-        const m = new Matrix();
-        const dx = x1 - x0;
-        const dy = y1 - y0;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-        const angle = Math.atan2(dy, dx);
-        m.scale(dist / defaultSize, 1);
-        m.rotate(angle);
-        m.translate(x0, y0);
-        if (this.textureSpace === "local") {
-          m.scale(defaultSize, defaultSize);
-        }
-        this.transform = m;
-      }
-      buildGradient() {
-        if (this.type === "linear") {
-          this.buildLinearGradient();
-        } else {
-          this.buildRadialGradient();
-        }
-      }
-      buildRadialGradient() {
-        if (this.texture)
-          return;
-        const colorStops = this.colorStops.length ? this.colorStops : emptyColorStops;
-        const defaultSize = this._textureSize;
-        const { canvas, context } = getCanvas(defaultSize, defaultSize);
-        const { x: x0, y: y0 } = this.center;
-        const { x: x1, y: y1 } = this.outerCenter;
-        const r0 = this.innerRadius;
-        const r1 = this.outerRadius;
-        const ox = x1 - r1;
-        const oy = y1 - r1;
-        const scale = defaultSize / (r1 * 2);
-        const cx = (x0 - ox) * scale;
-        const cy = (y0 - oy) * scale;
-        const gradient = context.createRadialGradient(
-          cx,
-          cy,
-          r0 * scale,
-          (x1 - ox) * scale,
-          (y1 - oy) * scale,
-          r1 * scale
-        );
-        addColorStops(gradient, colorStops);
-        context.fillStyle = colorStops[colorStops.length - 1].color;
-        context.fillRect(0, 0, defaultSize, defaultSize);
-        context.fillStyle = gradient;
-        context.translate(cx, cy);
-        context.rotate(this.rotation);
-        context.scale(1, this.scale);
-        context.translate(-cx, -cy);
-        context.fillRect(0, 0, defaultSize, defaultSize);
-        this.texture = new Texture({
-          source: new ImageSource({
-            resource: canvas,
-            addressModeU: "clamp-to-edge",
-            addressModeV: "clamp-to-edge"
-          })
-        });
-        const m = new Matrix();
-        m.scale(1 / scale, 1 / scale);
-        m.translate(ox, oy);
-        if (this.textureSpace === "local") {
-          m.scale(defaultSize, defaultSize);
-        }
-        this.transform = m;
-      }
-      /**
-       * Gets a unique key representing the current state of the gradient.
-       * Used internally for caching.
-       * @returns Unique string key
-       */
-      get styleKey() {
-        return this.uid;
-      }
-      destroy() {
-        var _a;
-        (_a = this.texture) == null ? void 0 : _a.destroy(true);
-        this.texture = null;
-      }
-    };
-    /**
-     * Default options for creating a gradient fill
-     * @property {PointData} start - Start point of the gradient (default: { x: 0, y: 0 })
-     * @property {PointData} end - End point of the gradient (default: { x: 0, y: 1 })
-     * @property {TextureSpace} textureSpace - Whether coordinates are 'global' or 'local' (default: 'local')
-     * @property {number} textureSize - The size of the texture to use for the gradient (default: 256)
-     * @property {Array<{offset: number, color: ColorSource}>} colorStops - Array of color stops (default: empty array)
-     * @property {GradientType} type - Type of gradient (default: 'linear')
-     */
-    _FillGradient.defaultLinearOptions = {
-      start: { x: 0, y: 0 },
-      end: { x: 0, y: 1 },
-      colorStops: [],
-      textureSpace: "local",
-      type: "linear",
-      textureSize: 256
-    };
-    /**
-     * Default options for creating a radial gradient fill
-     * @property {PointData} innerCenter - Center of the inner circle (default: { x: 0.5, y: 0.5 })
-     * @property {number} innerRadius - Radius of the inner circle (default: 0)
-     * @property {PointData} outerCenter - Center of the outer circle (default: { x: 0.5, y: 0.5 })
-     * @property {number} outerRadius - Radius of the outer circle (default: 0.5)
-     * @property {TextureSpace} textureSpace - Whether coordinates are 'global' or 'local' (default: 'local')
-     * @property {number} textureSize - The size of the texture to use for the gradient (default: 256)
-     * @property {Array<{offset: number, color: ColorSource}>} colorStops - Array of color stops (default: empty array)
-     * @property {GradientType} type - Type of gradient (default: 'radial')
-     */
-    _FillGradient.defaultRadialOptions = {
-      center: { x: 0.5, y: 0.5 },
-      innerRadius: 0,
-      outerRadius: 0.5,
-      colorStops: [],
-      scale: 1,
-      textureSpace: "local",
-      type: "radial",
-      textureSize: 256
-    };
-    let FillGradient = _FillGradient;
-    function addColorStops(gradient, colorStops) {
-      for (let i = 0; i < colorStops.length; i++) {
-        const stop = colorStops[i];
-        gradient.addColorStop(stop.offset, stop.color);
-      }
-    }
-    function getCanvas(width, height) {
-      const canvas = DOMAdapter.get().createCanvas(width, height);
-      const context = canvas.getContext("2d");
-      return { canvas, context };
-    }
-    function ensureGradientOptions(args) {
-      var _a, _b;
-      let options = (_a = args[0]) != null ? _a : {};
-      if (typeof options === "number" || args[1]) {
-        deprecation("8.5.2", `use options object instead`);
-        options = {
-          type: "linear",
-          start: { x: args[0], y: args[1] },
-          end: { x: args[2], y: args[3] },
-          textureSpace: args[4],
-          textureSize: (_b = args[5]) != null ? _b : FillGradient.defaultLinearOptions.textureSize
-        };
-      }
-      return options;
     }
 
     "use strict";
@@ -27362,7 +27627,7 @@ ${parts.join("\n")}
 
     "use strict";
     const DATA_URI = /^\s*data:(?:([\w-]+)\/([\w+.-]+))?(?:;charset=([\w-]+))?(?:;(base64))?,(.*)/i;
-    const VERSION = "8.8.0";
+    const VERSION = "8.9.2";
 
     "use strict";
     class ApplicationInitHook {
@@ -35870,6 +36135,7 @@ ${e}`);
       }
       /** Handles a restored webgl context. */
       handleContextRestored() {
+        this.getExtensions();
         this._renderer.runners.contextChange.emit(this.gl);
       }
       destroy() {
@@ -38949,7 +39215,13 @@ ${e}`);
     const WINDING = 4;
     const DEPTH_MASK = 5;
     const _GlStateSystem = class _GlStateSystem {
-      constructor() {
+      constructor(renderer) {
+        /**
+         * Whether to invert the front face when rendering
+         * This is used for render textures where the Y-coordinate is flipped
+         * @default false
+         */
+        this._invertFrontFace = false;
         this.gl = null;
         this.stateId = 0;
         this.polygonOffset = 0;
@@ -38964,6 +39236,15 @@ ${e}`);
         this.map[DEPTH_MASK] = this.setDepthMask;
         this.checks = [];
         this.defaultState = State.for2d();
+        renderer.renderTarget.onRenderTargetChange.add(this);
+      }
+      onRenderTargetChange(renderTarget) {
+        this._invertFrontFace = !renderTarget.isRoot;
+        if (this._cullFace) {
+          this.setFrontFace(this._frontFace);
+        } else {
+          this._frontFaceDirty = true;
+        }
       }
       contextChange(gl) {
         this.gl = gl;
@@ -39041,14 +39322,24 @@ ${e}`);
        * @param {boolean} value - Turn on or off webgl cull face.
        */
       setCullFace(value) {
+        this._cullFace = value;
         this.gl[value ? "enable" : "disable"](this.gl.CULL_FACE);
+        if (this._cullFace && this._frontFaceDirty) {
+          this.setFrontFace(this._frontFace);
+        }
       }
       /**
        * Sets the gl front face.
        * @param {boolean} value - true is clockwise and false is counter-clockwise
        */
       setFrontFace(value) {
-        this.gl.frontFace(this.gl[value ? "CW" : "CCW"]);
+        this._frontFace = value;
+        this._frontFaceDirty = false;
+        const faceMode = this._invertFrontFace ? !value : value;
+        if (this._glFrontFace !== faceMode) {
+          this._glFrontFace = faceMode;
+          this.gl.frontFace(this.gl[faceMode ? "CW" : "CCW"]);
+        }
       }
       /**
        * Sets the blend mode.
@@ -39088,6 +39379,12 @@ ${e}`);
       // used
       /** Resets all the logic and disables the VAOs. */
       resetState() {
+        this._glFrontFace = false;
+        this._frontFace = false;
+        this._cullFace = false;
+        this._frontFaceDirty = false;
+        this._invertFrontFace = false;
+        this.gl.frontFace(this.gl.CCW);
         this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, false);
         this.forceState(this.defaultState);
         this._blendEq = true;
@@ -39984,6 +40281,9 @@ ${e}`);
         this._activeTextureLocation = -1;
         this._boundTextures.fill(Texture.EMPTY.source);
         this._boundSamplers = /* @__PURE__ */ Object.create(null);
+        const gl = this._gl;
+        this._premultiplyAlpha = false;
+        gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, this._premultiplyAlpha);
       }
     }
     /** @ignore */
@@ -41723,6 +42023,7 @@ ${e}`);
     const _ViewSystem = class _ViewSystem {
       /**
        * Whether CSS dimensions of canvas view should be resized to screen dimensions automatically.
+       * This is only supported for HTMLCanvasElement and will be ignored if the canvas is an OffscreenCanvas.
        * @member {boolean}
        */
       get autoDensity() {
@@ -46210,6 +46511,8 @@ ${e}`);
     exports.DEPRECATED_SCALE_MODES = DEPRECATED_SCALE_MODES;
     exports.DEPRECATED_WRAP_MODES = DEPRECATED_WRAP_MODES;
     exports.DOMAdapter = DOMAdapter;
+    exports.DOMContainer = DOMContainer;
+    exports.DOMPipe = DOMPipe;
     exports.DRAW_MODES = DRAW_MODES;
     exports.DXGI_FORMAT = DXGI_FORMAT;
     exports.DXGI_TO_TEXTURE_FORMAT = DXGI_TO_TEXTURE_FORMAT;

@@ -86,7 +86,8 @@
     const SPEED_TOLERANCE=        1.5;
     const DIST_TOLERANCE=         15.0;
 
-    const POPSIZE=30;
+    const POP_SIZE=30;
+    var POPSIZE=30;
 
     const INPUTS=8;
     const OUTPUTS=4;
@@ -379,6 +380,7 @@
               _.delay(CLICK_DELAY,()=>{
                 GameMode = (b.m5.uuid == "play#1") ? "normal" : "trained";
                 console.log(`game mode: ==== ${GameMode}`);
+                if(GameMode=="trained") POPSIZE=1;
                 _Z.replace(self, "PlayGame");
               });
             };
@@ -477,7 +479,7 @@
     start(...args){ scenes(...args) }
   });
 
-  console.log(`unmanned version: 107`);
+  console.log(`unmanned version: 108`);
 })(this);
 
 
