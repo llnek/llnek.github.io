@@ -40,8 +40,10 @@
     const NN= window["io/czlab/mcfud/algo/NNet"]();
     const Core= window["io/czlab/mcfud/core"]();
 
-    const {TRAINED_NNET}= window["io/czlab/llnek-github-io/p/unmanned/data"]();
-    const TRAINED_NNET_STR= JSON.stringify(TRAINED_NNET);
+    const {TRAINED_NNET:TD1}= window["io/czlab/llnek-github-io/p/unmanned/tdata_1"]();
+    const {TRAINED_NNET:TD2}= window["io/czlab/llnek-github-io/p/unmanned/tdata_2"]();
+    const TDATA_1_STR= JSON.stringify(TD1);
+    const TDATA_2_STR= JSON.stringify(TD2);
     const C_ORANGE=_S.color("#f4d52b");
     const Params=GA.config({
     });
@@ -294,6 +296,7 @@
 			#score;
 			constructor(nn, calc, target){
 				super(nn, calc, target);
+        this.#score=0;
 				this.recalcScore();
 			}
 			getScore(){ return this.#score }
@@ -303,6 +306,9 @@
 				let [f,t]= this.getScoreCalcInfo();
 				return new ChromoNNet(this.copyGenes(), f, t);
 			}
+      forceMutate(m){
+        return m([this.getGeneAt(0)]);
+      }
       copyGenes(){
         return [this.getGeneAt(0).clone()];
       }
@@ -329,8 +335,14 @@
     }
 
     //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    function _createFromTData(){
+      let s= _.rand()> 0.5 ? TDATA_1_STR : TDATA_2_STR;
+      return [ NN.NeuralNet.fromJSON(JSON.parse(s)) ];
+    }
+
+    //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
     function _createFromScratch(){
-      return GameMode=="trained" ? new ChromoNNet([ NN.NeuralNet.fromJSON(JSON.parse(TRAINED_NNET_STR)) ], calcFit)
+      return GameMode=="trained" ? new ChromoNNet(_createFromTData(), calcFit)
         : new ChromoNNet([new NN.NeuralNet(INPUTS,OUTPUTS,{
           XXactOut: "linear",
           layers:[
@@ -351,11 +363,15 @@
     function _mutateFunc(genes){
       let nn= genes[0];
       nn.iterNodes(n=>{
-        if(_.rand() < Params.mutationRate)
+        if(_.rand() < Params.mutationRate){
           n.setBias(_mutateValue(n.getBias()));
+          //console.log(`changing bias`);
+        }
         n.iterOutLinks(k=>{
-          if(_.rand()< Params.mutationRate)
+          if(_.rand() < Params.mutationRate){
             k.weight= _mutateValue(k.weight);
+            //console.log(`changing weight`);
+          }
         });
       });
     }
@@ -380,7 +396,10 @@
               _.delay(CLICK_DELAY,()=>{
                 GameMode = (b.m5.uuid == "play#1") ? "normal" : "trained";
                 console.log(`game mode: ==== ${GameMode}`);
-                if(GameMode=="trained") POPSIZE=1;
+                if(GameMode=="trained"){
+                  Params.mutationRate=0.03;
+                  //POPSIZE=1;
+                }
                 _Z.replace(self, "PlayGame");
               });
             };
@@ -417,10 +436,14 @@
             this.waitNextWave=30;
             this.bestCurScore=0;
             if(!skip){
+              //console.log(`run beginning......`);
               this.neatObj.epoch(this.ships.reduce((acc,s)=>{
                 return acc.push(s.g.score) && _S.remove(s) && acc
               }, []));
-              this.ships= this.neatObj.createPhenotypes().map(g=> Ship(self,K,g));
+              let v= this.neatObj.createPhenotypes();
+              //if(GameMode=="trained" && v.length==1){ v[0].forceMutate(_mutateFunc); }
+              this.ships= v.map(g=> Ship(self,K,g));
+              //console.log(`new pop ready to run.......`);
             }
           },
           tick(dt){
@@ -479,7 +502,7 @@
     start(...args){ scenes(...args) }
   });
 
-  console.log(`unmanned version: 108`);
+  console.log(`unmanned version: 109`);
 })(this);
 
 

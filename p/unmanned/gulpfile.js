@@ -12,6 +12,7 @@ const jsFiles = [
   "../../vendor/mcfud.min.js",
   "../../vendor/crafty.min.js",
   "../../vendor/shimoji.min.js",
+  "trained_data_1.js",
   "trained_data_2.js",
   "nn1.js"
 ];

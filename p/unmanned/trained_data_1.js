@@ -26062,7 +26062,7 @@
   if(typeof module == "object" && module.exports){
     module.exports=_module(require("@czlab/mcfud"))
   }else{
-    gscope["io/czlab/llnek-github-io/p/unmanned/data"]=_module
+    gscope["io/czlab/llnek-github-io/p/unmanned/tdata_1"]=_module
   }
 
 })(this)
