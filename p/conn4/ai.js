@@ -19,7 +19,7 @@
   //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   window["io/czlab/conn4/AI"]=function(Mojo){
 
-    const Nega= window["io/czlab/mcfud/negamax"]();
+    const Nega= window["io/czlab/mcfud/algo/negamax"]();
     const {Game:_G,
            ute:_,is}=Mojo;
 

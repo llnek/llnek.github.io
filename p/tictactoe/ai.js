@@ -19,8 +19,8 @@
   //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   window["io/czlab/tictactoe/AI"]=function(Mojo){
 
-    const Algo= window["io/czlab/mcfud/negamax"]();
-    //const Algo= window["io/czlab/mcfud/minimax"]();
+    const Algo= window["io/czlab/mcfud/algo/negamax"]();
+    //const Algo= window["io/czlab/mcfud/algo/minimax"]();
     const {Game:_G,
            ute:_,is}=Mojo;
 

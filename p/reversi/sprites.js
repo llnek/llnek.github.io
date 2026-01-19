@@ -19,7 +19,7 @@
   //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   window["io/czlab/reversi/Sprites"]= function(Mojo){
 
-    const _N=window["io/czlab/mcfud/negamax"]();
+    const _N=window["io/czlab/mcfud/algo/negamax"]();
     const int=Math.floor;
     const {Scenes:_Z,
            Sprites:_S,

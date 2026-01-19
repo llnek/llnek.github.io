@@ -19,7 +19,7 @@
   //;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   window["io/czlab/chess/AI"]=function(Mojo){
 
-    const Mini= window["io/czlab/mcfud/minimax"]();
+    const Mini= window["io/czlab/mcfud/algo/minimax"]();
     const {Game:_G,
            ute:_,is}=Mojo;
 
